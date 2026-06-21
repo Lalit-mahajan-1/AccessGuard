@@ -1,0 +1,60 @@
+# ==========================================
+# 1. Dependency Directories
+# ==========================================
+**/node_modules/
+node_modules/
+
+# ==========================================
+# 2. Client-side (Next.js) Specifics
+# ==========================================
+client/.next/
+client/out/
+client/build/
+
+# Next.js telemetry and local development logs
+client/.next/cache/
+client/npm-debug.log*
+client/yarn-debug.log*
+client/yarn-error.log*
+client/.pnpm-debug.log*
+
+# ==========================================
+# 3. Server-side / Build Artifacts
+# ==========================================
+server/dist/
+server/build/
+**/tsc-output/
+
+# ==========================================
+# 4. Environment Variables & Secrets (CRITICAL)
+# ==========================================
+# Never commit your database URLs or API keys!
+.env
+.env.local
+.env.production
+.env.development
+*.env
+**/server/.env
+
+# But DO allow the example templates to be committed
+!*.env.example
+
+# ==========================================
+# 5. OS & IDE Files (Cleanliness)
+# ==========================================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# ==========================================
+# 6. Prisma Specifics (Optional but Recommended)
+# ==========================================
+# If you are using SQLite locally, ignore the actual database file
+server/prisma/*.db
+server/prisma/*.db-journal
