@@ -3,7 +3,7 @@ dotenv.config();
 
 const requiredEnvVars = [
     "PORT",
-    "DATABASe_URL"
+    "DATABASE_URL"
 ] as const;
 
 for(const envVar of requiredEnvVars)
