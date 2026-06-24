@@ -7,28 +7,17 @@ import { collectMemory } from '../services/memoryCollector.js';
 import { collectAccessibility } from '../services/accessibilityCollector.js';
 import { collectAxe } from '../services/axeCollector.js';
 
-export const analyzeUrl = async (req: Request, res: Response): Promise<void> => {
-  const { url } = req.body;
+// 🔹 Reusable core logic
+export const analyzeUrlData = async (url: string) => {
+  const session = await launchBrowser();
+  const { browser, page, cdp } = session;
 
-  if (!url) {
-    res.status(400).json({ error: 'URL is required' });
-    return;
-  }
-
-  let browser;
   try {
-    const session = await launchBrowser();
-    browser = session.browser;
-    const { page, cdp } = session;
-
-    // Attach collectors BEFORE navigation
     const consoleCollector = createConsoleCollector(cdp);
     const networkCollector = createNetworkCollector(cdp);
 
-    // Navigate
     await navigateAndWait(page, url);
 
-    // Collect data
     const performance = await collectPerformance(page, cdp);
     const memory = await collectMemory(cdp);
     const accessibility = await collectAccessibility(page);
@@ -36,19 +25,32 @@ export const analyzeUrl = async (req: Request, res: Response): Promise<void> => 
 
     await browser.close();
 
-    res.json({
-      success: true,
-      data: {
-        console: consoleCollector.getResult(),
-        network: networkCollector.getResult(url),
-        performance,
-        memory,
-        accessibility,
-        axeCore,
-      },
-    });
+    return {
+      console: consoleCollector.getResult(),
+      network: networkCollector.getResult(url),
+      performance,
+      memory,
+      accessibility,
+      axeCore,
+    };
+  } catch (err) {
+    await browser.close();
+    throw err;
+  }
+};
+
+// 🔹 Express handler (just calls the core function)
+export const analyzeUrl = async (req: Request, res: Response): Promise<void> => {
+  const { url } = req.body;
+  if (!url) {
+    res.status(400).json({ error: 'URL is required' });
+    return;
+  }
+
+  try {
+    const data = await analyzeUrlData(url);
+    res.json({ success: true, data });
   } catch (err: any) {
-    if (browser) await browser.close();
     res.status(500).json({ success: false, error: err.message });
   }
 };

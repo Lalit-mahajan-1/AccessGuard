@@ -55,12 +55,12 @@ export const crawlLinks = async (
     }, baseHost);
 
     await browser.close();
-    console.log(links.slice(0, 5))
+
     res.json({
       success: true,
       source: url,
-      count: links.slice(0, 5).length,
-      links: links.slice(0, 5),
+      count: links.length,
+      links: links,
     });
   } catch (err: any) {
     if (browser) await browser.close();
