@@ -58,3 +58,4 @@ Thumbs.db
 # If you are using SQLite locally, ignore the actual database file
 server/prisma/*.db
 server/prisma/*.db-journal
+server/src/generated/

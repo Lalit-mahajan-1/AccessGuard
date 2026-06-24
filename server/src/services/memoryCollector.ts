@@ -4,7 +4,7 @@ export const collectMemory = async (cdp: CDPSession) => {
   const perfMetrics = await cdp.send('Performance.getMetrics');
 
   const pick = (name: string) =>
-    perfMetrics.metrics.find((m: any) => m.name === name)?.value;
+  perfMetrics.metrics.find((m: any) => m.name === name)?.value ?? 0;
 
   return {
     jsHeapUsedMB: +(pick('JSHeapUsedSize') / 1048576).toFixed(2),

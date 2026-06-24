@@ -59,7 +59,12 @@ export const createNetworkCollector = (cdp: CDPSession) => {
       byType[t].count++;
       byType[t].sizeKB += r.sizeKB || 0;
     });
-    Object.keys(byType).forEach((k) => (byType[k].sizeKB = +byType[k].sizeKB.toFixed(2)));
+    Object.keys(byType).forEach((k) => {
+  const item = byType[k];
+  if (!item) return;
+
+  item.sizeKB = +item.sizeKB.toFixed(2);
+});
 
     const thirdParty = [
       ...new Set(
