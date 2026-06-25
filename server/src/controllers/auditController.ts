@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { analyzeUrlData } from './urlController.js';
-import { lighthouseData } from './lighthouseController.js';
+import { lighthouseData } from './LightHouseController.js';
 
 export const fullAudit = async (req: Request, res: Response): Promise<void> => {
   const { url } = req.body;
