@@ -28,7 +28,7 @@ interface AccessibilityTabProps {
     };
     violations: AccessibilityViolation[];
   };
-  passes?: any;
+  passes?: unknown;
   lighthouseScore?: number | null;
 }
 

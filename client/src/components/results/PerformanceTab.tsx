@@ -2,6 +2,7 @@ import { ScoreGauge } from "@/components/ui/ScoreGauge";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Zap, Cpu, Database, AlertTriangle, Info } from "lucide-react";
+import type { LighthouseSuggestionItem } from "@/schemas/auditSchema";
 
 interface PerformanceTabProps {
   metrics?: {
@@ -22,8 +23,8 @@ interface PerformanceTabProps {
   };
   lighthouseScore?: number | null;
   suggestions?: {
-    insights?: any[];
-    diagnostics?: any[];
+    insights?: LighthouseSuggestionItem[];
+    diagnostics?: LighthouseSuggestionItem[];
   };
 }
 
@@ -50,7 +51,7 @@ export function PerformanceTab({ metrics, lighthouseScore, suggestions }: Perfor
   };
 
   // Helper to remove markdown links from Lighthouse text
-  const cleanText = (text: string) => text?.replace(/\[(.*?)\]\(.*?\)/g, '$1');
+  const cleanText = (text?: string) => text?.replace(/\[(.*?)\]\(.*?\)/g, '$1') ?? "";
 
   return (
     <div className="space-y-6 mt-4">
@@ -105,7 +106,7 @@ export function PerformanceTab({ metrics, lighthouseScore, suggestions }: Perfor
               Optimization Opportunities (Why points were deducted)
             </h3>
             <div className="space-y-4">
-              {suggestions.insights.map((insight: any, idx: number) => (
+              {suggestions.insights.map((insight, idx) => (
                 <div key={idx} className="p-4 bg-rose-50/50 border border-rose-100 rounded-lg">
                   <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                     <div>
@@ -193,7 +194,7 @@ export function PerformanceTab({ metrics, lighthouseScore, suggestions }: Perfor
               Diagnostics & Detailed Findings
             </h3>
             <div className="space-y-3 divide-y divide-slate-100">
-              {suggestions.diagnostics.map((diag: any, idx: number) => (
+              {suggestions.diagnostics.map((diag, idx) => (
                 <div key={idx} className="pt-3 first:pt-0">
                   <h4 className="font-semibold text-slate-800 text-sm">{diag.title}</h4>
                   <p className="text-xs text-slate-500 mt-1">{cleanText(diag.description)}</p>

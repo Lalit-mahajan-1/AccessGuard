@@ -15,6 +15,21 @@ export const auditSchema = z.object({
 
 export type AuditFormValues = z.infer<typeof auditSchema>;
 
+export interface LighthouseSuggestionItem {
+  title?: string;
+  description?: string;
+  displayValue?: string;
+}
+
+export interface LighthouseSuggestions {
+  top?: LighthouseSuggestionItem;
+  insights?: LighthouseSuggestionItem[];
+  diagnostics?: LighthouseSuggestionItem[];
+  manualChecks?: LighthouseSuggestionItem[];
+  general?: LighthouseSuggestionItem[];
+  trustAndSafety?: LighthouseSuggestionItem[];
+}
+
 export interface AuditResponse {
   success: boolean;
   url: string;
@@ -105,14 +120,7 @@ export interface AuditResponse {
       bestPractices: number | null;
       seo: number | null;
     };
-    suggestion?: {
-      top: any;
-      insights: any[];
-      diagnostics: any[];
-      manualChecks: any[];
-      general: any[];
-      trustAndSafety: any[];
-    };
+    suggestion?: LighthouseSuggestions;
   };
 }
 

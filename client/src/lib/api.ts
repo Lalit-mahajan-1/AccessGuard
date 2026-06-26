@@ -1,12 +1,43 @@
 import axios, { AxiosError } from 'axios';
 import { toast } from 'sonner';
 import type { AuditResponse, CrawlerResponse, ApiError } from '@/schemas/auditSchema';
-import { mockAuditResponse, delay } from './mockData';
+
+interface AuditApiResponse {
+  success: boolean;
+  url: string;
+  analyze?: AuditResponse['analyze'];
+  lighthouse?: AuditResponse['lighthouse'];
+}
+
+interface AnalyzeApiResponse {
+  data?: {
+    performance?: AuditResponse['analyze'] extends infer Analyze
+      ? Analyze extends { performanceMetrics?: infer Metrics }
+        ? Metrics
+        : never
+      : never;
+    axeCore?: AuditResponse['analyze'] extends infer Analyze
+      ? Analyze extends { accessibility?: infer Accessibility }
+        ? Accessibility
+        : never
+      : never;
+    console?: AuditResponse['analyze'] extends infer Analyze
+      ? Analyze extends { consoleLogs?: infer ConsoleLogs }
+        ? ConsoleLogs
+        : never
+      : never;
+    network?: AuditResponse['analyze'] extends infer Analyze
+      ? Analyze extends { networkRequests?: infer NetworkRequests }
+        ? NetworkRequests
+        : never
+      : never;
+  };
+}
 
 // Axios instance
 // Timeout increased to 5 minutes because Lighthouse + Playwright together can take 2-3 minutes on slower machines
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api',
   timeout: 300000, // 5 minutes
   headers: {
     'Content-Type': 'application/json',
@@ -57,7 +88,7 @@ export const pingServer = async (): Promise<boolean> => {
 // --- API Functions ---
 
 export const runAudit = async (url: string): Promise<AuditResponse> => {
-  const { data } = await api.post<any>('/audit', { url });
+  const { data } = await api.post<AuditApiResponse>('/audit', { url });
   return {
     success: data.success,
     url: data.url,
@@ -77,7 +108,7 @@ export const runAudit = async (url: string): Promise<AuditResponse> => {
 };
 
 export const runAnalyze = async (url: string): Promise<AuditResponse['analyze']> => {
-  const { data } = await api.post<any>('/analyze', { url });
+  const { data } = await api.post<AnalyzeApiResponse>('/analyze', { url });
   const analyzeData = data.data;
   return {
     performanceMetrics: {

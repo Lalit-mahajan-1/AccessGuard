@@ -284,7 +284,7 @@ export function CrawlerSection({ baseUrl, onPageAudited, onViewReport, activeRep
         {!crawlerMutation.data && !crawlerMutation.isPending && !crawlerMutation.isError && (
           <div className="py-8 text-center text-gray-500">
             <Compass className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p>Click "Discover Pages" to find all internal links on this website</p>
+            <p>Click &quot;Discover Pages&quot; to find all internal links on this website</p>
           </div>
         )}
       </CardContent>

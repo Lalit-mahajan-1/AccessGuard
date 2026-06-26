@@ -1,6 +1,7 @@
 import { ScoreGauge } from "@/components/ui/ScoreGauge";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Award, Star, AlertTriangle } from "lucide-react";
+import type { LighthouseSuggestionItem } from "@/schemas/auditSchema";
 
 interface SEOTabProps {
   scores?: {
@@ -10,7 +11,7 @@ interface SEOTabProps {
     seo?: number | null;
   };
   suggestions?: {
-    trustAndSafety?: any[];
+    trustAndSafety?: LighthouseSuggestionItem[];
   };
 }
 
@@ -27,7 +28,7 @@ export function SEOTab({ scores, suggestions }: SEOTabProps) {
     return "F";
   };
 
-  const cleanText = (text: string) => text?.replace(/\[(.*?)\]\(.*?\)/g, '$1');
+  const cleanText = (text?: string) => text?.replace(/\[(.*?)\]\(.*?\)/g, '$1') ?? "";
 
   return (
     <div className="space-y-6 mt-4">
@@ -62,7 +63,7 @@ export function SEOTab({ scores, suggestions }: SEOTabProps) {
               Security & Trust Warnings
             </h3>
             <div className="space-y-3">
-              {suggestions.trustAndSafety.map((issue: any, idx: number) => (
+              {suggestions.trustAndSafety.map((issue, idx) => (
                 <div key={idx} className="p-3 bg-amber-50/50 border border-amber-100 rounded-lg text-sm">
                   <h4 className="font-bold text-slate-800">{issue.title}</h4>
                   <p className="text-slate-600 mt-1">{cleanText(issue.description)}</p>
