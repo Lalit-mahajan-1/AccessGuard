@@ -24,4 +24,4 @@ import {env} from  "./src/config/env.js";
 // }
 // start();
 
-app.listen(env.PORT, () => console.log('Server on port 5000'));
+app.listen(env.PORT, () => console.log(`Server on port ${env.PORT}`));
