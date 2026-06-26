@@ -1,7 +1,5 @@
 "use client";
 
-// Audit Result visualization components
-
 import { motion } from "framer-motion";
 import { ExternalLink, RefreshCw, Clock, Zap, Shield, Terminal, Globe, Search } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
@@ -29,9 +27,9 @@ export function AuditResults({ data, onRerun, isRerunning }: AuditResultsProps) 
     lighthouseScores?.accessibility,
     lighthouseScores?.bestPractices,
     lighthouseScores?.seo,
-  ].filter((s): s is number => s !== undefined && s !== null);
+  ].filter((s): s is number => s !== undefined && s !== null).map((s) => Math.round(s * 100));
 
-  const overallScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+  const overallScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
@@ -67,10 +65,18 @@ export function AuditResults({ data, onRerun, isRerunning }: AuditResultsProps) 
           <div className="flex flex-col md:flex-row items-center justify-center gap-8">
             <ScoreGauge score={overallScore} label="Overall Score" size="lg" />
             <div className="flex flex-wrap justify-center gap-6">
-              {lighthouseScores?.performance !== undefined && lighthouseScores.performance !== null && <ScoreGauge score={lighthouseScores.performance} label="Performance" size="sm" />}
-              {lighthouseScores?.accessibility !== undefined && lighthouseScores.accessibility !== null && <ScoreGauge score={lighthouseScores.accessibility} label="Accessibility" size="sm" />}
-              {lighthouseScores?.bestPractices !== undefined && lighthouseScores.bestPractices !== null && <ScoreGauge score={lighthouseScores.bestPractices} label="Best Practices" size="sm" />}
-              {lighthouseScores?.seo !== undefined && lighthouseScores.seo !== null && <ScoreGauge score={lighthouseScores.seo} label="SEO" size="sm" />}
+              {lighthouseScores?.performance !== undefined && lighthouseScores.performance !== null && (
+                <ScoreGauge score={Math.round(lighthouseScores.performance * 100)} label="Performance" size="sm" />
+              )}
+              {lighthouseScores?.accessibility !== undefined && lighthouseScores.accessibility !== null && (
+                <ScoreGauge score={Math.round(lighthouseScores.accessibility * 100)} label="Accessibility" size="sm" />
+              )}
+              {lighthouseScores?.bestPractices !== undefined && lighthouseScores.bestPractices !== null && (
+                <ScoreGauge score={Math.round(lighthouseScores.bestPractices * 100)} label="Best Practices" size="sm" />
+              )}
+              {lighthouseScores?.seo !== undefined && lighthouseScores.seo !== null && (
+                <ScoreGauge score={Math.round(lighthouseScores.seo * 100)} label="SEO" size="sm" />
+              )}
             </div>
           </div>
         </CardContent>
@@ -85,11 +91,31 @@ export function AuditResults({ data, onRerun, isRerunning }: AuditResultsProps) 
           <TabsTrigger value="seo" icon={<Search className="w-4 h-4" />}>SEO & Best Practices</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="performance"><PerformanceTab metrics={analyzeData?.performanceMetrics} lighthouseScore={lighthouseScores?.performance} /></TabsContent>
-        <TabsContent value="accessibility"><AccessibilityTab violations={analyzeData?.accessibility} lighthouseScore={lighthouseScores?.accessibility} /></TabsContent>
-        <TabsContent value="console"><ConsoleTab logs={analyzeData?.consoleLogs} /></TabsContent>
-        <TabsContent value="network"><NetworkTab requests={analyzeData?.networkRequests} /></TabsContent>
-        <TabsContent value="seo"><SEOTab scores={lighthouseScores} /></TabsContent>
+        <TabsContent value="performance">
+          <PerformanceTab
+            metrics={analyzeData?.performanceMetrics}
+            lighthouseScore={lighthouseScores?.performance}
+          />
+        </TabsContent>
+
+        <TabsContent value="accessibility">
+          <AccessibilityTab
+            violations={analyzeData?.accessibility}
+            lighthouseScore={lighthouseScores?.accessibility}
+          />
+        </TabsContent>
+
+        <TabsContent value="console">
+          <ConsoleTab logs={analyzeData?.consoleLogs} />
+        </TabsContent>
+
+        <TabsContent value="network">
+          <NetworkTab requests={analyzeData?.networkRequests} />
+        </TabsContent>
+
+        <TabsContent value="seo">
+          <SEOTab scores={lighthouseScores} />
+        </TabsContent>
       </Tabs>
     </motion.div>
   );

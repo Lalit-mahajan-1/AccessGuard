@@ -1,7 +1,7 @@
 import { ScoreGauge } from "@/components/ui/ScoreGauge";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
-import { Zap, Cpu, Database } from "lucide-react";
+import { Zap, Cpu, Database, AlertTriangle, Info } from "lucide-react";
 
 interface PerformanceTabProps {
   metrics?: {
@@ -21,9 +21,13 @@ interface PerformanceTabProps {
     };
   };
   lighthouseScore?: number | null;
+  suggestions?: {
+    insights?: any[];
+    diagnostics?: any[];
+  };
 }
 
-export function PerformanceTab({ metrics, lighthouseScore }: PerformanceTabProps) {
+export function PerformanceTab({ metrics, lighthouseScore, suggestions }: PerformanceTabProps) {
   const webVitals = metrics?.webVitals;
   const runtime = metrics?.runtime;
 
@@ -45,11 +49,14 @@ export function PerformanceTab({ metrics, lighthouseScore }: PerformanceTabProps
     return { label: "Poor", variant: "critical" as const };
   };
 
+  // Helper to remove markdown links from Lighthouse text
+  const cleanText = (text: string) => text?.replace(/\[(.*?)\]\(.*?\)/g, '$1');
+
   return (
     <div className="space-y-6 mt-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="md:col-span-1 flex flex-col items-center justify-center py-6">
-          <ScoreGauge score={lighthouseScore ?? 0} label="Lighthouse Performance" size="lg" />
+          <ScoreGauge score={Math.round((lighthouseScore ?? 0) * 100)} label="Lighthouse Performance" size="lg" />
         </Card>
 
         <Card className="md:col-span-2">
@@ -89,6 +96,36 @@ export function PerformanceTab({ metrics, lighthouseScore }: PerformanceTabProps
         </Card>
       </div>
 
+      {/* 🔥 THE NEW SUGGESTIONS/INSIGHTS SECTION 🔥 */}
+      {suggestions?.insights && suggestions.insights.length > 0 && (
+        <Card className="border-rose-100">
+          <CardContent className="pt-6">
+            <h3 className="text-md font-bold text-rose-700 mb-4 flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5" />
+              Optimization Opportunities (Why points were deducted)
+            </h3>
+            <div className="space-y-4">
+              {suggestions.insights.map((insight: any, idx: number) => (
+                <div key={idx} className="p-4 bg-rose-50/50 border border-rose-100 rounded-lg">
+                  <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                    <div>
+                      <h4 className="font-bold text-slate-900">{insight.title}</h4>
+                      <p className="text-sm text-slate-600 mt-1">{cleanText(insight.description)}</p>
+                    </div>
+                    {insight.displayValue && (
+                      <Badge variant="critical" className="flex-shrink-0 whitespace-nowrap bg-rose-100 text-rose-800 border-rose-200">
+                        {insight.displayValue}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Existing Runtime / DOM details */}
       {runtime && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
@@ -145,6 +182,27 @@ export function PerformanceTab({ metrics, lighthouseScore }: PerformanceTabProps
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {/* Diagnostics (Smaller performance issues) */}
+      {suggestions?.diagnostics && suggestions.diagnostics.length > 0 && (
+        <Card>
+          <CardContent className="pt-6">
+            <h3 className="text-md font-bold text-amber-700 mb-4 flex items-center gap-2">
+              <Info className="w-5 h-5" />
+              Diagnostics & Detailed Findings
+            </h3>
+            <div className="space-y-3 divide-y divide-slate-100">
+              {suggestions.diagnostics.map((diag: any, idx: number) => (
+                <div key={idx} className="pt-3 first:pt-0">
+                  <h4 className="font-semibold text-slate-800 text-sm">{diag.title}</h4>
+                  <p className="text-xs text-slate-500 mt-1">{cleanText(diag.description)}</p>
+                  {diag.displayValue && <span className="text-xs font-mono bg-slate-100 px-2 py-0.5 rounded mt-2 inline-block text-slate-700">{diag.displayValue}</span>}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

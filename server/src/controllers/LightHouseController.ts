@@ -10,7 +10,11 @@ if (!existsSync(REPORTS_DIR)) mkdirSync(REPORTS_DIR, { recursive: true });
 
 // 🔹 Reusable core logic
 export const lighthouseData = async (url: string, req: Request) => {
-  const chrome = await chromeLauncher.launch({ chromeFlags: ['--headless'] });
+  const startTime = Date.now();
+  console.log(`[Lighthouse] Starting audit for ${url}`);
+
+  const chrome = await chromeLauncher.launch({ chromeFlags: ['--headless', '--no-sandbox', '--disable-gpu'] });
+  console.log(`[Lighthouse] Chrome launched on port ${chrome.port}`);
 
   try {
     const options: any = {
@@ -20,12 +24,17 @@ export const lighthouseData = async (url: string, req: Request) => {
       port: chrome.port,
     };
 
+    console.log(`[Lighthouse] Running audit...`);
     const runnerResult = await lighthouse(url, options);
+
     if (!runnerResult) throw new Error('Lighthouse returned no result');
+
+    console.log(`[Lighthouse] Audit complete. Saving report...`);
 
     const reportId = `${randomUUID()}.html`;
     const reportPath = join(REPORTS_DIR, reportId);
     writeFileSync(reportPath, runnerResult.report as string);
+
     const reportUrl = `${req.protocol}://${req.get('host')}/reports/${reportId}`;
 
     const lhr = runnerResult.lhr;
@@ -48,6 +57,7 @@ export const lighthouseData = async (url: string, req: Request) => {
 
     const top = failedOpportunities[0] as any;
     const topSuggestion = top ? formatAudit(top) : null;
+
     const insights = failedOpportunities.slice(0, 10).map(formatAudit);
 
     const diagnostics = Object.values(audits)
@@ -85,12 +95,16 @@ export const lighthouseData = async (url: string, req: Request) => {
       'deprecations',
       'errors-in-console',
     ];
+
     const trustAndSafety = trustAndSafetyIds
       .map((id) => audits[id])
       .filter((a: any) => a && a.score !== null && a.score < 1)
       .map(formatAudit);
 
     await chrome.kill();
+
+    const elapsed = (Date.now() - startTime) / 1000;
+    console.log(`[Lighthouse] Total time: ${elapsed}s`);
 
     return {
       reportUrl,
@@ -111,6 +125,7 @@ export const lighthouseData = async (url: string, req: Request) => {
     };
   } catch (err) {
     await chrome.kill();
+    console.error(`[Lighthouse] ERROR:`, err);
     throw err;
   }
 };
@@ -118,6 +133,7 @@ export const lighthouseData = async (url: string, req: Request) => {
 // 🔹 Express handler
 export const LighthouseReport = async (req: Request, res: Response): Promise<void> => {
   const { url } = req.body;
+
   if (!url) {
     res.status(400).json({ error: 'URL is required' });
     return;

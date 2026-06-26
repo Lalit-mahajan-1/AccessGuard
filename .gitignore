@@ -59,3 +59,5 @@ Thumbs.db
 server/prisma/*.db
 server/prisma/*.db-journal
 server/src/generated/
+
+server/public/reports/

@@ -1,6 +1,6 @@
 import { ScoreGauge } from "@/components/ui/ScoreGauge";
 import { Card, CardContent } from "@/components/ui/Card";
-import { Award, Star } from "lucide-react";
+import { Award, Star, AlertTriangle } from "lucide-react";
 
 interface SEOTabProps {
   scores?: {
@@ -9,9 +9,12 @@ interface SEOTabProps {
     bestPractices?: number | null;
     seo?: number | null;
   };
+  suggestions?: {
+    trustAndSafety?: any[];
+  };
 }
 
-export function SEOTab({ scores }: SEOTabProps) {
+export function SEOTab({ scores, suggestions }: SEOTabProps) {
   const bestPracticesScore = scores?.bestPractices ?? 0;
   const seoScore = scores?.seo ?? 0;
 
@@ -24,11 +27,13 @@ export function SEOTab({ scores }: SEOTabProps) {
     return "F";
   };
 
+  const cleanText = (text: string) => text?.replace(/\[(.*?)\]\(.*?\)/g, '$1');
+
   return (
     <div className="space-y-6 mt-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="flex flex-col items-center justify-center py-8">
-          <ScoreGauge score={seoScore} label="Lighthouse SEO Score" size="lg" />
+          <ScoreGauge score={Math.round(seoScore * 100)} label="Lighthouse SEO Score" size="lg" />
           <div className="mt-4 text-center">
             <span className="text-xs font-semibold text-slate-500 uppercase">Search Engine Optimization</span>
             <p className="text-sm font-bold text-slate-800 mt-1">
@@ -38,7 +43,7 @@ export function SEOTab({ scores }: SEOTabProps) {
         </Card>
 
         <Card className="flex flex-col items-center justify-center py-8">
-          <ScoreGauge score={bestPracticesScore} label="Best Practices Score" size="lg" />
+          <ScoreGauge score={Math.round(bestPracticesScore * 100)} label="Best Practices Score" size="lg" />
           <div className="mt-4 text-center">
             <span className="text-xs font-semibold text-slate-500 uppercase">Security & Reliability</span>
             <p className="text-sm font-bold text-slate-800 mt-1">
@@ -47,6 +52,26 @@ export function SEOTab({ scores }: SEOTabProps) {
           </div>
         </Card>
       </div>
+
+      {/* Trust & Safety Warnings Section */}
+      {suggestions?.trustAndSafety && suggestions.trustAndSafety.length > 0 && (
+        <Card className="border-amber-100">
+          <CardContent className="pt-6">
+            <h3 className="text-md font-bold text-amber-700 mb-4 flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5" />
+              Security & Trust Warnings
+            </h3>
+            <div className="space-y-3">
+              {suggestions.trustAndSafety.map((issue: any, idx: number) => (
+                <div key={idx} className="p-3 bg-amber-50/50 border border-amber-100 rounded-lg text-sm">
+                  <h4 className="font-bold text-slate-800">{issue.title}</h4>
+                  <p className="text-slate-600 mt-1">{cleanText(issue.description)}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardContent className="pt-6">

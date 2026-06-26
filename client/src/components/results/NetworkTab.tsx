@@ -62,11 +62,11 @@ export function NetworkTab({ requests }: NetworkTabProps) {
           <CardContent className="pt-6 text-center">
             <ShieldAlert className="w-8 h-8 text-rose-500 mx-auto mb-2" />
             <span className="text-xs font-semibold text-slate-500">Failed Requests</span>
-            <p className="text-3xl font-black text-slate-900 mt-1">
+            <div className="text-3xl font-black text-slate-900 mt-1">
               <Badge variant={failedCount > 0 ? "critical" : "success"} className="text-lg px-3">
                 {failedCount}
               </Badge>
-            </p>
+            </div>
           </CardContent>
         </Card>
       </div>

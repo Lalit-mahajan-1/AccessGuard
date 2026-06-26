@@ -53,7 +53,7 @@ export function AccessibilityTab({ violations, lighthouseScore }: AccessibilityT
     <div className="space-y-6 mt-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="md:col-span-1 flex flex-col items-center justify-center py-6">
-          <ScoreGauge score={lighthouseScore ?? 0} label="Lighthouse Accessibility" size="lg" />
+          <ScoreGauge score={Math.round((lighthouseScore ?? 0) * 100)} label="Lighthouse Accessibility" size="lg" />
         </Card>
 
         <Card className="md:col-span-2">

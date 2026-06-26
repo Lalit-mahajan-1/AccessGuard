@@ -12,6 +12,8 @@ import type { AuditResponse } from "@/schemas/auditSchema";
 interface CrawlerSectionProps {
   baseUrl: string;
   onPageAudited: (url: string, data: AuditResponse) => void;
+  onViewReport?: (url: string) => void;
+  activeReportUrl?: string;
 }
 
 interface PageAuditStatus {
@@ -21,9 +23,10 @@ interface PageAuditStatus {
   error?: string;
 }
 
-export function CrawlerSection({ baseUrl, onPageAudited }: CrawlerSectionProps) {
+export function CrawlerSection({ baseUrl, onPageAudited, onViewReport, activeReportUrl }: CrawlerSectionProps) {
   const crawlerMutation = useCrawlerMutation();
   const auditMutation = useAuditMutation();
+
   const [pageStatuses, setPageStatuses] = useState<PageAuditStatus[]>([]);
   const [selectedUrls, setSelectedUrls] = useState<Set<string>>(new Set());
 
@@ -55,7 +58,7 @@ export function CrawlerSection({ baseUrl, onPageAudited }: CrawlerSectionProps) 
 
   const auditSelectedPages = async () => {
     const urls = Array.from(selectedUrls);
-    
+
     // Initialize statuses
     setPageStatuses(urls.map((url) => ({ url, status: "pending" })));
 
@@ -85,6 +88,15 @@ export function CrawlerSection({ baseUrl, onPageAudited }: CrawlerSectionProps) 
 
   const isAuditingPages = pageStatuses.some((p) => p.status === "auditing");
 
+  // Safe helper to get pathname (handles invalid URLs gracefully)
+  const getSafePathname = (url: string) => {
+    try {
+      return new URL(url).pathname || "/";
+    } catch {
+      return url;
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -98,6 +110,7 @@ export function CrawlerSection({ baseUrl, onPageAudited }: CrawlerSectionProps) 
               Find all internal pages on this website and audit them
             </p>
           </div>
+
           {!crawlerMutation.data && (
             <button
               onClick={handleCrawl}
@@ -134,7 +147,7 @@ export function CrawlerSection({ baseUrl, onPageAudited }: CrawlerSectionProps) 
           </div>
         )}
 
-        {crawlerMutation.data && (
+        {crawlerMutation.data && crawlerMutation.data.urls && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <p className="text-sm text-gray-600">
@@ -158,66 +171,83 @@ export function CrawlerSection({ baseUrl, onPageAudited }: CrawlerSectionProps) 
             </div>
 
             <div className="max-h-80 overflow-y-auto border border-gray-200 rounded-lg">
-              {crawlerMutation.data.urls.map((url, index) => {
-                const pageStatus = pageStatuses.find((p) => p.url === url);
-                const isSelected = selectedUrls.has(url);
+              {crawlerMutation.data.urls.length > 0 ? (
+                crawlerMutation.data.urls.map((url, index) => {
+                  const pageStatus = pageStatuses.find((p) => p.url === url);
+                  const isSelected = selectedUrls.has(url);
 
-                return (
-                  <motion.div
-                    key={url}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.02 }}
-                    className={`flex items-center gap-3 px-4 py-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 ${
-                      isSelected ? "bg-indigo-50" : ""
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => toggleUrlSelection(url)}
-                      disabled={isAuditingPages}
-                      className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
-                    />
-
-                    <a
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 text-sm text-gray-700 hover:text-indigo-600 truncate flex items-center gap-1"
+                  return (
+                    <motion.div
+                      key={url}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.02 }}
+                      className={`flex items-center gap-3 px-4 py-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 ${
+                        isSelected ? "bg-indigo-50" : ""
+                      }`}
                     >
-                      {new URL(url).pathname || "/"}
-                      <ExternalLink className="w-3 h-3 flex-shrink-0" />
-                    </a>
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleUrlSelection(url)}
+                        disabled={isAuditingPages}
+                        className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
+                      />
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 text-sm text-gray-700 hover:text-indigo-600 truncate flex items-center gap-1"
+                      >
+                        {getSafePathname(url)}
+                        <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                      </a>
 
-                    {pageStatus && (
-                      <div className="flex-shrink-0">
-                        {pageStatus.status === "pending" && (
-                          <Badge variant="info">Pending</Badge>
-                        )}
-                        {pageStatus.status === "auditing" && (
-                          <Badge variant="moderate">
-                            <Loader2 className="w-3 h-3 animate-spin mr-1" />
-                            Auditing
-                          </Badge>
-                        )}
-                        {pageStatus.status === "completed" && (
-                          <Badge variant="success">
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            Done
-                          </Badge>
-                        )}
-                        {pageStatus.status === "failed" && (
-                          <Badge variant="critical">
-                            <XCircle className="w-3 h-3 mr-1" />
-                            Failed
-                          </Badge>
-                        )}
-                      </div>
-                    )}
-                  </motion.div>
-                );
-              })}
+                      {pageStatus && (
+                        <div className="flex-shrink-0">
+                          {pageStatus.status === "pending" && (
+                            <Badge variant="info">Pending</Badge>
+                          )}
+                          {pageStatus.status === "auditing" && (
+                            <Badge variant="moderate">
+                              <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                              Auditing
+                            </Badge>
+                          )}
+                          {pageStatus.status === "completed" && (
+                            <div className="flex items-center gap-2">
+                              <Badge variant="success">
+                                <CheckCircle className="w-3 h-3 mr-1" />
+                                Done
+                              </Badge>
+                              {activeReportUrl === url ? (
+                                <Badge variant="info">Viewing</Badge>
+                              ) : (
+                                <button
+                                  onClick={() => onViewReport?.(url)}
+                                  className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold underline cursor-pointer"
+                                >
+                                  View Report
+                                </button>
+                              )}
+                            </div>
+                          )}
+                          {pageStatus.status === "failed" && (
+                            <Badge variant="critical">
+                              <XCircle className="w-3 h-3 mr-1" />
+                              Failed
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                })
+              ) : (
+                <p className="p-4 text-sm text-gray-500 text-center">
+                  No internal pages found.
+                </p>
+              )}
             </div>
 
             {selectedUrls.size > 0 && (

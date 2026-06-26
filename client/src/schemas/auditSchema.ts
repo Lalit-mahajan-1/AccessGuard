@@ -1,12 +1,16 @@
 import { z } from "zod";
 
 export const auditSchema = z.object({
-  url: z.string()
+  url: z
+    .string()
     .min(1, { message: "URL is required" })
     .url({ message: "Please enter a valid URL (e.g., https://example.com)" })
-    .refine((val) => val.startsWith('http://') || val.startsWith('https://'), {
-      message: "URL must start with http:// or https://",
-    }),
+    .refine(
+      (val) => val.startsWith("http://") || val.startsWith("https://"),
+      {
+        message: "URL must start with http:// or https://",
+      }
+    ),
 });
 
 export type AuditFormValues = z.infer<typeof auditSchema>;
@@ -85,6 +89,12 @@ export interface AuditResponse {
           referrerPolicy: string | null;
         };
       } | null;
+    };
+    memory?: {
+      jsHeapUsedMB: number;
+      jsHeapTotalMB: number;
+      documents: number;
+      frames: number;
     };
   };
   lighthouse?: {

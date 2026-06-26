@@ -1,22 +1,22 @@
-// AccessGuard API client
-import axios, { AxiosError } from "axios";
-import { toast } from "sonner";
-import type { AuditResponse, CrawlerResponse, ApiError } from "@/schemas/auditSchema";
-import { mockAuditResponse, delay, isDemoMode } from "./mockData";
+import axios, { AxiosError } from 'axios';
+import { toast } from 'sonner';
+import type { AuditResponse, CrawlerResponse, ApiError } from '@/schemas/auditSchema';
+import { mockAuditResponse, delay } from './mockData';
 
-// Axios instance with Next.js environment variable
+// Axios instance
+// Timeout increased to 5 minutes because Lighthouse + Playwright together can take 2-3 minutes on slower machines
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api",
-  timeout: 120000, // 2 minutes for heavy Lighthouse audits
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api',
+  timeout: 300000, // 5 minutes
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
 });
 
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
-    console.log(`[API] ${config.method?.toUpperCase()} ${config.url}`);
+    console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url} at ${new Date().toLocaleTimeString()}`);
     return config;
   },
   (error) => Promise.reject(error)
@@ -24,63 +24,85 @@ api.interceptors.request.use(
 
 // Response interceptor with Premium Error Toast
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log(`[API Response] ${response.config.url} - Status: ${response.status} at ${new Date().toLocaleTimeString()}`);
+    return response;
+  },
   (error: AxiosError<ApiError>) => {
     const message =
       error.response?.data?.message ||
       error.message ||
-      "An unexpected error occurred while connecting to the server.";
+      'An unexpected error occurred while connecting to the server.';
 
     console.error(`[API Error] ${message}`);
-    // Show premium toast notification
+
     toast.error(message, {
-      description: "Please check your URL or backend server.",
+      description: 'Backend is taking too long or is unreachable. Please check if the server is running.',
     });
-    
+
     return Promise.reject(new Error(message));
   }
 );
 
+// --- Health Check (Ping) ---
+export const pingServer = async (): Promise<boolean> => {
+  try {
+    await api.get('/health', { timeout: 5000 });
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 // --- API Functions ---
 
 export const runAudit = async (url: string): Promise<AuditResponse> => {
-  if (isDemoMode()) {
-    await delay(3000);
-    return { ...mockAuditResponse, url, timestamp: new Date().toISOString() };
-  }
-  const { data } = await api.post<AuditResponse>("/audit", { url });
-  return data;
+  const { data } = await api.post<any>('/audit', { url });
+  return {
+    success: data.success,
+    url: data.url,
+    timestamp: new Date().toISOString(),
+    analyze: data.analyze ? {
+      performanceMetrics: data.analyze.performanceMetrics,
+      accessibility: data.analyze.accessibility,
+      consoleLogs: data.analyze.consoleLogs,
+      networkRequests: data.analyze.networkRequests,
+    } : undefined,
+    lighthouse: data.lighthouse ? {
+      reportUrl: data.lighthouse.reportUrl,
+      scores: data.lighthouse.scores,
+      suggestion: data.lighthouse.suggestion,
+    } : undefined,
+  };
 };
 
-export const runAnalyze = async (url: string): Promise<AuditResponse["analyze"]> => {
-  if (isDemoMode()) {
-    await delay(2000);
-    return mockAuditResponse.analyze;
-  }
-  const { data } = await api.post("/analyze", { url });
-  return data;
+export const runAnalyze = async (url: string): Promise<AuditResponse['analyze']> => {
+  const { data } = await api.post<any>('/analyze', { url });
+  const analyzeData = data.data;
+  return {
+    performanceMetrics: {
+      webVitals: analyzeData?.performance?.webVitals,
+      runtime: analyzeData?.performance?.runtime,
+    },
+    accessibility: analyzeData?.axeCore,
+    consoleLogs: analyzeData?.console,
+    networkRequests: analyzeData?.network,
+  };
 };
 
-export const runLighthouse = async (url: string): Promise<AuditResponse["lighthouse"]> => {
-  if (isDemoMode()) {
-    await delay(2000);
-    return mockAuditResponse.lighthouse;
-  }
-  const { data } = await api.post("/lighthouse", { url });
+export const runLighthouse = async (url: string): Promise<AuditResponse['lighthouse']> => {
+  const { data } = await api.post('/lighthouse', { url });
   return data;
 };
 
 export const runCrawler = async (url: string): Promise<CrawlerResponse> => {
-  if (isDemoMode()) {
-    await delay(1500);
-    const baseUrl = new URL(url).origin;
-    return {
-      baseUrl,
-      urls: [`${baseUrl}/`, `${baseUrl}/about`, `${baseUrl}/contact`],
-      totalFound: 3,
-    };
-  }
-  const { data } = await api.post<{ success: boolean; source: string; count: number; links: string[] }>("/crawler", { url });
+  const { data } = await api.post<{
+    success: boolean;
+    source: string;
+    count: number;
+    links: string[];
+  }>('/crawler', { url });
+
   return {
     baseUrl: data.source,
     urls: data.links,
