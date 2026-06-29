@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { AuditForm } from "@/components/AuditForm";
 import { AuditResults } from "@/components/results/AuditResult";
 import { CrawlerSection } from "@/components/CrawlerSection";
@@ -9,7 +9,7 @@ import { LoadingOverlay } from "@/components/ui/LoadingSpinner";
 import { useAuditMutation } from "@/hooks/useAudit";
 import { pingServer } from "@/lib/api";
 import type { AuditFormValues, AuditResponse } from "@/schemas/auditSchema";
-import { ArrowLeft, Shield, Code2, Wifi, WifiOff } from "lucide-react";
+import { ArrowLeft, ScanEye, Code2, Wifi, WifiOff } from "lucide-react";
 
 export default function DashboardPage() {
   const auditMutation = useAuditMutation();
@@ -71,81 +71,111 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans relative overflow-x-hidden">
+      {/* Background Mesh */}
+      <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-40">
+        <div className="absolute w-[60vw] h-[60vw] bg-indigo-50 rounded-full blur-[120px] -translate-y-1/4" />
+        <div className="absolute w-[50vw] h-[50vw] bg-violet-50 rounded-full blur-[100px] translate-x-1/4" />
+      </div>
+
       <AnimatePresence>
         {auditMutation.isPending && (
           <LoadingOverlay message={loadingMessage} />
         )}
       </AnimatePresence>
 
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
-              <Shield className="w-5 h-5 text-white" />
+            <div className="bg-indigo-50 p-2 rounded-xl text-indigo-600 ring-1 ring-indigo-100">
+              <ScanEye size={20} strokeWidth={2} />
             </div>
             <div>
-              <h1 className="font-bold text-gray-900">AccessGuard</h1>
-              <p className="text-xs text-gray-500">Performance & Accessibility</p>
+              <h1 className="font-semibold text-slate-900 tracking-tight">AccessGuard</h1>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             {serverOnline === false && (
-              <div className="flex items-center gap-1.5 text-red-600 text-xs font-semibold bg-red-50 px-3 py-1.5 rounded-full border border-red-100">
+              <div className="flex items-center gap-1.5 text-rose-600 text-xs font-medium bg-rose-50 px-3 py-1.5 rounded-full border border-rose-100">
                 <WifiOff className="w-3.5 h-3.5" />
-                Server Offline
+                Offline
               </div>
             )}
             {serverOnline === true && (
-              <div className="flex items-center gap-1.5 text-emerald-600 text-xs font-semibold bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
+              <div className="flex items-center gap-1.5 text-emerald-600 text-xs font-medium bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
                 <Wifi className="w-3.5 h-3.5" />
-                Server Online
+                Online
               </div>
             )}
             <a
               href="https://github.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
+              className="p-2 text-slate-400 hover:text-slate-900 transition-colors bg-white rounded-full border border-slate-200 shadow-sm"
             >
-              <Code2 className="w-5 h-5" />
+              <Code2 className="w-4 h-4" />
             </a>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-6 py-12 relative z-10">
         {serverOnline === false && !auditMutation.isPending && !hasResults && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
-            <p className="font-semibold">Backend Server Not Reachable</p>
-            <p className="mt-1">
-              Make sure your backend is running on the correct port and CORS is enabled.
-              Default: <code className="bg-red-100 px-1.5 py-0.5 rounded">http://localhost:3000</code>
-            </p>
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8 p-4 bg-rose-50 border border-rose-200 rounded-2xl text-rose-700 text-sm flex items-center gap-3 shadow-sm"
+          >
+            <WifiOff className="w-5 h-5 shrink-0" />
+            <div>
+              <p className="font-medium">Backend Server Not Reachable</p>
+              <p className="text-rose-600/80 mt-0.5">
+                Ensure your backend is running on <code className="bg-rose-100/50 px-1.5 py-0.5 rounded font-mono text-xs">http://localhost:3000</code>
+              </p>
+            </div>
+          </motion.div>
         )}
 
         {!hasResults ? (
-          <div className="py-12">
-            <AuditForm onSubmit={handleSubmit} isPending={auditMutation.isPending} />
+          <div className="py-20 flex flex-col items-center justify-center text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="max-w-2xl w-full"
+            >
+              <h2 className="text-4xl font-medium tracking-tight text-slate-900 mb-4">
+                Audit your platform
+              </h2>
+              <p className="text-slate-500 mb-10 text-lg font-light">
+                Enter a URL to generate a comprehensive accessibility and performance report.
+              </p>
+              
+              <div className="w-full">
+                <AuditForm onSubmit={handleSubmit} isPending={auditMutation.isPending} />
+              </div>
+            </motion.div>
           </div>
         ) : (
-          <div className="space-y-8">
-            <div className="flex items-center gap-4 flex-wrap">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="space-y-8"
+          >
+            <div className="flex items-center gap-4 flex-wrap pb-4 border-b border-slate-200">
               <button
                 onClick={handleReset}
-                className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors font-medium"
+                className="flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors font-medium text-sm bg-white px-4 py-2 rounded-full border border-slate-200 shadow-sm"
               >
                 <ArrowLeft className="w-4 h-4" />
-                Audit Another URL
+                New Audit
               </button>
               {activeReportUrl && (
                 <>
-                  <span className="text-gray-300">|</span>
                   <button
                     onClick={() => setActiveReportUrl("")}
-                    className="flex items-center gap-2 text-indigo-600 hover:text-indigo-950 font-bold transition-colors cursor-pointer"
+                    className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium transition-colors text-sm px-4 py-2 bg-indigo-50 rounded-full border border-indigo-100"
                   >
                     Back to Main Report
                   </button>
@@ -161,13 +191,15 @@ export default function DashboardPage() {
               />
             )}
 
-            <CrawlerSection
-              baseUrl={auditedUrl}
-              onPageAudited={handlePageAudited}
-              onViewReport={setActiveReportUrl}
-              activeReportUrl={activeReportUrl}
-            />
-          </div>
+            <div className="pt-8 border-t border-slate-200">
+              <CrawlerSection
+                baseUrl={auditedUrl}
+                onPageAudited={handlePageAudited}
+                onViewReport={setActiveReportUrl}
+                activeReportUrl={activeReportUrl}
+              />
+            </div>
+          </motion.div>
         )}
       </main>
     </div>

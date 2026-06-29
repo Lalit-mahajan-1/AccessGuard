@@ -61,7 +61,7 @@ const Hero = ({ onRunAudit }) => {
           scale: 0.95, 
           rotateX: 5, 
           y: "2vh",
-          boxShadow: "0 0 0 1px rgba(255,255,255,0.05), 0 30px 60px rgba(0,0,0,0.5)",
+          boxShadow: "0 0 0 1px rgba(0,0,0,0.05), 0 30px 60px rgba(0,0,0,0.08)",
           duration: 1.2, 
           ease: "power2.inOut" 
         }, 4);
@@ -80,8 +80,8 @@ const Hero = ({ onRunAudit }) => {
         .fromTo(".hud-3", { autoAlpha: 0, y: 50, z: 150 }, { autoAlpha: 1, y: 0, z: 150, duration: 1, ease: "back.out(1.2)" }, 5.1);
 
       // ACT 5: Flaw Detonation (Glitch)
-      tl.to(".input-portal", { skewX: -2, x: 5, filter: "brightness(1.5)", duration: 0.05, yoyo: true, repeat: 5 }, 6.5)
-        .to(".input-portal", { skewX: 0, x: 0, filter: "none", duration: 0.05 }, 6.8);
+      tl.to(".input-portal", { skewX: -1, x: 3, duration: 0.05, yoyo: true, repeat: 5 }, 6.5)
+        .to(".input-portal", { skewX: 0, x: 0, duration: 0.05 }, 6.8);
 
       tl.fromTo(".flaw-card",
         { autoAlpha: 0, scale: 0, x: 0, y: 0, z: -200 },
@@ -100,11 +100,11 @@ const Hero = ({ onRunAudit }) => {
       // ACT 6: The Diagnosis
       tl.to(".flaw-card, .hud-element", { autoAlpha: 0, y: "+=50", filter: "blur(10px)", duration: 0.8, stagger: 0.05 }, 8)
         .to(".input-portal", { 
-          borderColor: "rgba(225, 29, 72, 0.4)", 
-          boxShadow: "0 0 60px rgba(225, 29, 72, 0.15), 0 0 0 1px rgba(225, 29, 72, 0.4)", 
+          borderColor: "rgba(225, 29, 72, 0.2)", 
+          boxShadow: "0 0 40px rgba(225, 29, 72, 0.05), 0 0 0 1px rgba(225, 29, 72, 0.2)", 
           duration: 1 
         }, 8)
-        .to(".status-indicator", { backgroundColor: "#e11d48", boxShadow: "0 0 15px rgba(225,29,72,0.8)", duration: 0.5 }, 8);
+        .to(".status-indicator", { backgroundColor: "#e11d48", boxShadow: "0 0 10px rgba(225,29,72,0.4)", duration: 0.5 }, 8);
 
       const counterObj = { val: 0 };
       tl.to(counterObj, {
@@ -130,12 +130,12 @@ const Hero = ({ onRunAudit }) => {
   return (
     <section 
       ref={containerRef} 
-      className="relative w-full h-screen bg-[#050505] overflow-hidden perspective-[2000px] flex flex-col items-center justify-center font-sans text-white"
+      className="relative w-full h-screen bg-white overflow-hidden perspective-[2000px] flex flex-col items-center justify-center font-sans text-slate-900"
     >
-      {/* Background Layer: Deep Mesh Glows */}
-      <div className="bg-mesh absolute inset-0 opacity-[0.4] pointer-events-none will-change-transform flex items-center justify-center">
-        <div className="absolute w-[60vw] h-[60vw] bg-indigo-900/20 rounded-full blur-[120px] -translate-y-1/4 mix-blend-screen" />
-        <div className="absolute w-[50vw] h-[50vw] bg-violet-900/20 rounded-full blur-[100px] translate-x-1/4 mix-blend-screen" />
+      {/* Background Layer: Soft Mesh Glows */}
+      <div className="bg-mesh absolute inset-0 opacity-[0.8] pointer-events-none flex items-center justify-center">
+        <div className="absolute w-[60vw] h-[60vw] bg-indigo-50 rounded-full blur-[100px] -translate-y-1/4" />
+        <div className="absolute w-[50vw] h-[50vw] bg-violet-50 rounded-full blur-[100px] translate-x-1/4" />
       </div>
       
       {/* 3D Container */}
@@ -143,110 +143,110 @@ const Hero = ({ onRunAudit }) => {
 
         {/* --- ACT 1: INITIAL GREETING --- */}
         <div className="intro-wrapper absolute z-50 flex flex-col items-center text-center w-[90vw] max-w-5xl will-change-transform">
-          <div className="intro-item inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/80 font-medium text-xs tracking-[0.2em] uppercase mb-8 invisible backdrop-blur-md">
-            <Sparkles size={14} className="text-white/60" /> Advanced WCAG 2.2 Intelligence
+          <div className="intro-item inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-slate-500 font-medium text-xs tracking-[0.2em] uppercase mb-8 invisible shadow-sm">
+            <Sparkles size={14} className="text-indigo-500" /> Advanced WCAG 2.2 Intelligence
           </div>
-          <h1 className="intro-item text-5xl md:text-7xl lg:text-[7rem] font-medium tracking-tight text-white leading-[1.05] mb-8 invisible">
+          <h1 className="intro-item text-5xl md:text-7xl lg:text-[7rem] font-medium tracking-tight text-slate-900 leading-[1.05] mb-8 invisible">
             Audit the web.<br />
-            <span className="text-white/40">Empower everyone.</span>
+            <span className="text-slate-400">Empower everyone.</span>
           </h1>
-          <p className="intro-item text-lg md:text-xl text-white/50 font-normal max-w-2xl mb-8 invisible">
+          <p className="intro-item text-lg md:text-xl text-slate-500 font-normal max-w-2xl mb-8 invisible">
             Instantly parse DOM structures, contrast matrices, and ARIA topologies to secure perfect accessibility compliance in milliseconds.
           </p>
         </div>
 
-        {/* --- ACT 2-5: THE INPUT PORTAL (Double-Bezel) --- */}
-        <div className="input-portal absolute w-[90vw] max-w-3xl z-30 [transform-style:preserve-3d] will-change-transform p-2 bg-white/[0.02] backdrop-blur-2xl border border-white/10 rounded-[2rem] shadow-2xl invisible">
+        {/* --- ACT 2-5: THE INPUT PORTAL (Double-Bezel Light) --- */}
+        <div className="input-portal absolute w-[90vw] max-w-3xl z-30 [transform-style:preserve-3d] will-change-transform p-2 bg-white/60 backdrop-blur-2xl border border-slate-200/60 rounded-[2rem] shadow-[0_20px_60px_rgba(0,0,0,0.05)] invisible">
           
-          <div className="portal-glow absolute inset-0 rounded-[2rem] shadow-[0_0_60px_rgba(255,255,255,0.05)] pointer-events-none" />
+          <div className="portal-glow absolute inset-0 rounded-[2rem] pointer-events-none" />
 
           {/* Inner Core */}
-          <div className="relative bg-[#0a0a0a] rounded-[calc(2rem-0.5rem)] border border-white/5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] p-6 md:p-10 flex flex-col gap-8 overflow-hidden">
+          <div className="relative bg-slate-50/80 rounded-[calc(2rem-0.5rem)] border border-slate-200/50 shadow-sm p-6 md:p-10 flex flex-col gap-8 overflow-hidden">
             
             {/* Module Header */}
-            <div className="flex items-center justify-between text-white/40 font-mono text-[10px] md:text-xs tracking-widest uppercase">
+            <div className="flex items-center justify-between text-slate-400 font-mono text-[10px] md:text-xs tracking-widest uppercase">
               <span className="flex items-center gap-3">
-                <span className="status-indicator w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
+                <span className="status-indicator w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
                 Connection Established
               </span>
-              <span className="font-semibold text-white/60">AG_CORE_V2</span>
+              <span className="font-semibold text-slate-500">AG_CORE_V2</span>
             </div>
 
-            <h2 className="text-3xl md:text-4xl font-normal text-white tracking-tight">Inject target URL</h2>
+            <h2 className="text-3xl md:text-4xl font-normal text-slate-900 tracking-tight">Inject target URL</h2>
 
             {/* URL Bar */}
-            <div className="relative w-full bg-[#111] border border-white/10 rounded-2xl p-5 flex items-center gap-4 text-lg md:text-xl font-mono shadow-inner overflow-hidden">
-              <Link2 className="text-white/20 shrink-0" strokeWidth={1.5} />
+            <div className="relative w-full bg-white border border-slate-200 rounded-2xl p-5 flex items-center gap-4 text-lg md:text-xl font-mono shadow-sm overflow-hidden">
+              <Link2 className="text-slate-300 shrink-0" strokeWidth={1.5} />
               <div className="relative flex-1 whitespace-nowrap overflow-hidden flex items-center">
-                <span className="placeholder-text absolute text-white/20">https://domain.com</span>
-                <span className="typed-url inline-block overflow-hidden border-r-2 border-white/50 w-0 text-white font-light">
+                <span className="placeholder-text absolute text-slate-300">https://domain.com</span>
+                <span className="typed-url inline-block overflow-hidden border-r-2 border-indigo-400 w-0 text-slate-800 font-light">
                   https://example.com/shop
                 </span>
               </div>
             </div>
 
             {/* Final Counter Overlay */}
-            <div className="flaws-label absolute inset-0 flex flex-col items-center justify-center bg-black/80 backdrop-blur-xl invisible z-50">
-              <ShieldAlert className="w-10 h-10 text-rose-500 mb-6 opacity-80" strokeWidth={1.5} />
-              <div className="text-7xl md:text-9xl font-light text-white tracking-tighter drop-shadow-md">
+            <div className="flaws-label absolute inset-0 flex flex-col items-center justify-center bg-white/90 backdrop-blur-xl invisible z-50 rounded-[calc(2rem-0.5rem)]">
+              <ShieldAlert className="w-10 h-10 text-rose-500 mb-6" strokeWidth={1.5} />
+              <div className="text-7xl md:text-9xl font-light text-slate-900 tracking-tighter drop-shadow-sm">
                 <span ref={counterRef}>0</span>
               </div>
-              <span className="text-rose-500/80 font-mono tracking-[0.2em] uppercase mt-6 text-xs">Violations Detected</span>
+              <span className="text-rose-500 font-mono tracking-[0.2em] uppercase mt-6 text-xs font-semibold">Violations Detected</span>
             </div>
 
             {/* The Holographic Laser */}
-            <div className="scanner-laser absolute left-[-2%] w-[104%] h-[1px] bg-white z-40 pointer-events-none" 
-                 style={{ boxShadow: "0 0 20px 2px rgba(255,255,255,0.4), 0 0 40px 5px rgba(255,255,255,0.1)" }}>
+            <div className="scanner-laser absolute left-[-2%] w-[104%] h-[1.5px] bg-indigo-500 z-40 pointer-events-none" 
+                 style={{ boxShadow: "0 0 15px 2px rgba(99,102,241,0.4), 0 0 30px 5px rgba(99,102,241,0.1)" }}>
             </div>
           </div>
         </div>
 
-        {/* --- FLOATING HUD ELEMENTS (Dark Mode) --- */}
-        <div className="hud-element hud-1 absolute top-[20%] left-[10%] bg-[#111]/90 backdrop-blur-xl border border-white/10 px-5 py-3 rounded-xl font-mono text-white/60 text-xs flex items-center gap-3 z-20 invisible shadow-2xl">
-          <Terminal size={14} className="text-white/40" /> [Parsing DOM tree]
+        {/* --- FLOATING HUD ELEMENTS (Light Mode) --- */}
+        <div className="hud-element hud-1 absolute top-[20%] left-[10%] bg-white/95 backdrop-blur-xl border border-slate-200 px-5 py-3 rounded-xl font-mono text-slate-500 text-xs flex items-center gap-3 z-20 invisible shadow-xl">
+          <Terminal size={14} className="text-slate-400" /> [Parsing DOM tree]
         </div>
-        <div className="hud-element hud-2 absolute bottom-[25%] right-[15%] bg-[#111]/90 backdrop-blur-xl border border-white/10 px-5 py-3 rounded-xl font-mono text-white/60 text-xs flex items-center gap-3 z-20 invisible shadow-2xl">
-          <ScanSearch size={14} className="text-white/40" /> [Evaluating Contrast Matrix]
+        <div className="hud-element hud-2 absolute bottom-[25%] right-[15%] bg-white/95 backdrop-blur-xl border border-slate-200 px-5 py-3 rounded-xl font-mono text-slate-500 text-xs flex items-center gap-3 z-20 invisible shadow-xl">
+          <ScanSearch size={14} className="text-slate-400" /> [Evaluating Contrast Matrix]
         </div>
-        <div className="hud-element hud-3 absolute top-[30%] right-[10%] bg-[#111]/90 backdrop-blur-xl border border-white/10 px-5 py-3 rounded-xl font-mono text-white/60 text-xs flex items-center gap-3 z-20 invisible shadow-2xl">
-          <Fingerprint size={14} className="text-white/40" /> [Verifying ARIA Roles]
+        <div className="hud-element hud-3 absolute top-[30%] right-[10%] bg-white/95 backdrop-blur-xl border border-slate-200 px-5 py-3 rounded-xl font-mono text-slate-500 text-xs flex items-center gap-3 z-20 invisible shadow-xl">
+          <Fingerprint size={14} className="text-slate-400" /> [Verifying ARIA Roles]
         </div>
 
-        {/* --- FLAW DETONATION CARDS (Dark Mode) --- */}
-        <div className="flaw-card absolute bg-[#111]/90 backdrop-blur-2xl border border-white/10 p-5 rounded-2xl flex items-center gap-5 z-40 invisible shadow-[0_20px_40px_rgba(0,0,0,0.5)]">
-          <div className="p-2.5 bg-rose-500/10 rounded-xl text-rose-500"><AlertOctagon size={20} strokeWidth={1.5} /></div>
+        {/* --- FLAW DETONATION CARDS (Light Mode) --- */}
+        <div className="flaw-card absolute bg-white border border-slate-200 p-5 rounded-2xl flex items-center gap-5 z-40 invisible shadow-[0_20px_40px_rgba(0,0,0,0.08)]">
+          <div className="p-2.5 bg-rose-50 rounded-xl text-rose-600"><AlertOctagon size={20} strokeWidth={1.5} /></div>
           <div>
-            <p className="text-rose-500/70 text-[10px] font-mono tracking-widest uppercase mb-1">Critical</p>
-            <p className="text-white/90 text-sm font-medium">Low Contrast (3.1:1)</p>
+            <p className="text-rose-500 text-[10px] font-mono tracking-widest uppercase mb-1 font-semibold">Critical</p>
+            <p className="text-slate-800 text-sm font-medium">Low Contrast (3.1:1)</p>
           </div>
         </div>
 
-        <div className="flaw-card absolute bg-[#111]/90 backdrop-blur-2xl border border-white/10 p-5 rounded-2xl flex items-center gap-5 z-40 invisible shadow-[0_20px_40px_rgba(0,0,0,0.5)]">
-          <div className="p-2.5 bg-rose-500/10 rounded-xl text-rose-500"><AlertOctagon size={20} strokeWidth={1.5} /></div>
+        <div className="flaw-card absolute bg-white border border-slate-200 p-5 rounded-2xl flex items-center gap-5 z-40 invisible shadow-[0_20px_40px_rgba(0,0,0,0.08)]">
+          <div className="p-2.5 bg-rose-50 rounded-xl text-rose-600"><AlertOctagon size={20} strokeWidth={1.5} /></div>
           <div>
-            <p className="text-rose-500/70 text-[10px] font-mono tracking-widest uppercase mb-1">High</p>
-            <p className="text-white/90 text-sm font-medium">Missing Alt Attribute</p>
+            <p className="text-rose-500 text-[10px] font-mono tracking-widest uppercase mb-1 font-semibold">High</p>
+            <p className="text-slate-800 text-sm font-medium">Missing Alt Attribute</p>
           </div>
         </div>
 
-        <div className="flaw-card absolute bg-[#111]/90 backdrop-blur-2xl border border-white/10 p-5 rounded-2xl flex items-center gap-5 z-40 invisible shadow-[0_20px_40px_rgba(0,0,0,0.5)]">
-          <div className="p-2.5 bg-rose-500/10 rounded-xl text-rose-500"><AlertOctagon size={20} strokeWidth={1.5} /></div>
+        <div className="flaw-card absolute bg-white border border-slate-200 p-5 rounded-2xl flex items-center gap-5 z-40 invisible shadow-[0_20px_40px_rgba(0,0,0,0.08)]">
+          <div className="p-2.5 bg-amber-50 rounded-xl text-amber-600"><AlertOctagon size={20} strokeWidth={1.5} /></div>
           <div>
-            <p className="text-rose-500/70 text-[10px] font-mono tracking-widest uppercase mb-1">Medium</p>
-            <p className="text-white/90 text-sm font-medium">Form Label Missing</p>
+            <p className="text-amber-500 text-[10px] font-mono tracking-widest uppercase mb-1 font-semibold">Medium</p>
+            <p className="text-slate-800 text-sm font-medium">Form Label Missing</p>
           </div>
         </div>
 
         {/* --- ACT 6: FINAL CTA --- */}
         <div className="final-cta absolute bottom-[8vh] z-50 flex flex-col items-center gap-6 invisible">
-          <span className="text-white/40 font-mono text-[10px] tracking-[0.2em] uppercase">[ Scroll down to remediate ]</span>
+          <span className="text-slate-400 font-mono text-[10px] tracking-[0.2em] uppercase font-semibold">[ Scroll down to remediate ]</span>
           <button
             type="button"
             onClick={onRunAudit}
-            className="group relative flex items-center gap-4 bg-white text-black pl-6 pr-2 py-2 rounded-full font-medium text-sm hover:bg-gray-200 transition-colors shadow-[0_0_30px_rgba(255,255,255,0.15)]"
+            className="group relative flex items-center gap-4 bg-slate-900 text-white pl-6 pr-2 py-2 rounded-full font-medium text-sm hover:bg-slate-800 transition-colors shadow-lg"
           >
             <span>Initiate Fix Sequence</span>
-            <div className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center group-hover:bg-black/10 transition-colors">
+            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
               <ArrowRight size={16} strokeWidth={1.5} className="group-hover:translate-x-1 group-active:translate-x-2 transition-transform duration-300" />
             </div>
           </button>

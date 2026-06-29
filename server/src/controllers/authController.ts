@@ -23,6 +23,7 @@ const sendTokenResponse = (user: any, statusCode: number, res: Response) => {
     .cookie('accessguard_token', token, options)
     .json({
       success: true,
+      token,
       user: { id: user.id, name: user.name, email: user.email },
     });
 };

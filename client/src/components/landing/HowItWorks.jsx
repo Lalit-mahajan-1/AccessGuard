@@ -95,7 +95,7 @@ const HowItWorks = () => {
           );
 
           gsap.fromTo(bubble,
-            { scale: 0.5, backgroundColor: "#111", color: "#6366f1", borderColor: "#333" },
+            { scale: 0.5, backgroundColor: "#f8fafc", color: "#6366f1", borderColor: "#e2e8f0" },
             {
               scale: 1, backgroundColor: "#6366f1", color: "#ffffff", borderColor: "#6366f1",
               duration: 0.5,
@@ -119,25 +119,25 @@ const HowItWorks = () => {
   return (
     <section 
       ref={sectionRef} 
-      className="relative w-full h-screen bg-[#050505] text-white overflow-hidden flex flex-col"
+      className="relative w-full h-screen bg-white text-slate-900 overflow-hidden flex flex-col"
       id="how-it-works"
     >
       
       {/* Background Subtle Grid */}
       <div 
-        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        className="absolute inset-0 opacity-[0.2]"
         style={{ 
-          backgroundImage: 'linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)', 
+          backgroundImage: 'linear-gradient(to right, #cbd5e1 1px, transparent 1px), linear-gradient(to bottom, #cbd5e1 1px, transparent 1px)', 
           backgroundSize: '4vw 4vw' 
         }} 
       />
 
       {/* Fixed Header Content inside the pinned section */}
       <div className="absolute top-12 md:top-24 left-0 w-full px-6 md:px-16 z-20 pointer-events-none flex flex-col items-start">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/60 font-medium text-[10px] tracking-widest uppercase mb-4 backdrop-blur-md">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-slate-500 font-medium text-[10px] tracking-widest uppercase mb-4 shadow-sm">
           The Process
         </div>
-        <h2 className="text-4xl md:text-5xl font-light tracking-tight text-white">
+        <h2 className="text-4xl md:text-5xl font-light tracking-tight text-slate-900">
           Mechanism
         </h2>
       </div>
@@ -152,7 +152,7 @@ const HowItWorks = () => {
         {/* The Continuous SVG Connecting Line */}
         <div className="absolute top-1/2 left-0 w-full h-2 -translate-y-1/2 z-0 px-[50vw]">
            <svg className="w-full h-full" preserveAspectRatio="none">
-             <line x1="0" y1="50%" x2="100%" y2="50%" className="stroke-white/10" strokeWidth="2" />
+             <line x1="0" y1="50%" x2="100%" y2="50%" className="stroke-slate-200" strokeWidth="2" />
              <line 
                 ref={lineRef}
                 x1="0" y1="50%" x2="100%" y2="50%" 
@@ -162,7 +162,7 @@ const HowItWorks = () => {
                 pathLength="1" 
                 strokeDasharray="1" 
                 strokeDashoffset="1" 
-                style={{ filter: "drop-shadow(0 0 8px rgba(99,102,241,0.8))" }}
+                style={{ filter: "drop-shadow(0 0 8px rgba(99,102,241,0.4))" }}
              />
            </svg>
         </div>
@@ -180,20 +180,20 @@ const HowItWorks = () => {
             >
               
               {/* Outer Shell Wrapper (Double Bezel) */}
-              <div className={`step-card relative w-full max-w-lg p-2 rounded-[2.5rem] bg-white/[0.02] border border-white/5 backdrop-blur-xl z-10 shadow-2xl ${isFirst ? '' : 'scale-90 opacity-20 translate-y-12'}`}>
+              <div className={`step-card relative w-full max-w-lg p-2 rounded-[2.5rem] bg-white/60 border border-slate-200/60 backdrop-blur-xl z-10 shadow-xl ${isFirst ? '' : 'scale-90 opacity-20 translate-y-12'}`}>
                 
                 {/* Connecting Node/Bubble */}
-                <div className={`step-bubble absolute -top-10 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full border-4 flex items-center justify-center shadow-[0_0_30px_rgba(0,0,0,0.5)] z-20 transition-colors ${isFirst ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-[#111] text-indigo-500 border-[#333]'}`}>
+                <div className={`step-bubble absolute -top-10 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full border-4 flex items-center justify-center shadow-lg z-20 transition-colors ${isFirst ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-slate-50 text-indigo-500 border-slate-200'}`}>
                   <Icon size={24} strokeWidth={2} />
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-black text-white rounded-full text-[10px] font-bold flex items-center justify-center border border-white/20">
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-slate-900 text-white rounded-full text-[10px] font-bold flex items-center justify-center border border-slate-700">
                     {step.id}
                   </div>
                 </div>
 
                 {/* Inner Core */}
-                <div className="bg-[#0a0a0a] rounded-[calc(2.5rem-0.5rem)] border border-white/5 p-8 md:p-12 text-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
-                  <h3 className="text-2xl md:text-3xl font-medium text-white mb-4 tracking-tight">{step.title}</h3>
-                  <p className="text-lg text-white/50 leading-relaxed font-light">
+                <div className="bg-white rounded-[calc(2.5rem-0.5rem)] border border-slate-200 p-8 md:p-12 text-center shadow-sm">
+                  <h3 className="text-2xl md:text-3xl font-medium text-slate-900 mb-4 tracking-tight">{step.title}</h3>
+                  <p className="text-lg text-slate-500 leading-relaxed font-light">
                     {step.description}
                   </p>
                 </div>

@@ -36,13 +36,13 @@ const Footer = () => {
   };
 
   return (
-    <footer className="relative bg-[#030303] text-white/50 pt-24 pb-10 overflow-hidden font-sans z-50">
+    <footer className="relative bg-white text-slate-500 pt-24 pb-10 overflow-hidden font-sans z-50">
       
       {/* The Glowing Top Border */}
-      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
 
       {/* Subtle Background Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none mix-blend-screen" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-indigo-50 blur-[120px] rounded-full pointer-events-none" />
 
       <motion.div 
         variants={containerVariants}
@@ -55,22 +55,22 @@ const Footer = () => {
         {/* --- COLUMN 1: Brand & Mission --- */}
         <motion.div variants={itemVariants} className="lg:col-span-4 flex flex-col pr-8">
           <div className="flex items-center gap-3 mb-6 cursor-pointer">
-            <div className="bg-white/10 p-1.5 rounded-full text-white ring-1 ring-white/20">
-              <ScanEye size={18} strokeWidth={1.5} />
+            <div className="bg-indigo-50 p-1.5 rounded-full text-indigo-600 ring-1 ring-indigo-100">
+              <ScanEye size={18} strokeWidth={2} />
             </div>
-            <span className="font-semibold text-xl tracking-wide text-white">AccessGuard</span>
+            <span className="font-semibold text-xl tracking-wide text-slate-900">AccessGuard</span>
           </div>
-          <p className="text-white/40 font-light leading-relaxed mb-8 text-sm">
+          <p className="text-slate-500 font-light leading-relaxed mb-8 text-sm">
             Bridging the web accessibility gap through visual DOM exploration and advanced AI code remediation. Design for everyone.
           </p>
           <div className="flex items-center gap-4">
-            <a href="#" className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-colors">
+            <a href="#" className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-900 hover:bg-slate-50 transition-colors shadow-sm">
               <TwitterIcon size={16} />
             </a>
-            <a href="#" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-colors">
+            <a href="#" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-900 hover:bg-slate-50 transition-colors shadow-sm">
               <GithubIcon size={16} />
             </a>
-            <a href="#" className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-colors">
+            <a href="#" className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-900 hover:bg-slate-50 transition-colors shadow-sm">
               <LinkedinIcon size={16} />
             </a>
           </div>
@@ -78,50 +78,50 @@ const Footer = () => {
 
         {/* --- COLUMN 2: Product Links --- */}
         <motion.div variants={itemVariants} className="lg:col-span-2 flex flex-col">
-          <h3 className="text-white font-medium tracking-widest uppercase text-[10px] mb-6">Product</h3>
+          <h3 className="text-slate-900 font-medium tracking-widest uppercase text-[10px] mb-6">Product</h3>
           <ul className="space-y-4 text-sm font-light">
-            <li><a href="#" className="hover:text-white transition-colors flex items-center gap-2">Multi-Page Scan</a></li>
-            <li><a href="#" className="hover:text-white transition-colors flex items-center gap-2">Visual Explorer</a></li>
-            <li><a href="#" className="hover:text-white transition-colors flex items-center gap-2">AI Remediation</a></li>
-            <li><a href="#" className="hover:text-white transition-colors flex items-center gap-2">Score Tracking</a></li>
+            <li><a href="#" className="hover:text-indigo-600 transition-colors flex items-center gap-2">Multi-Page Scan</a></li>
+            <li><a href="#" className="hover:text-indigo-600 transition-colors flex items-center gap-2">Visual Explorer</a></li>
+            <li><a href="#" className="hover:text-indigo-600 transition-colors flex items-center gap-2">AI Remediation</a></li>
+            <li><a href="#" className="hover:text-indigo-600 transition-colors flex items-center gap-2">Score Tracking</a></li>
           </ul>
         </motion.div>
 
         {/* --- COLUMN 3: Resources --- */}
         <motion.div variants={itemVariants} className="lg:col-span-2 flex flex-col">
-          <h3 className="text-white font-medium tracking-widest uppercase text-[10px] mb-6">Resources</h3>
+          <h3 className="text-slate-900 font-medium tracking-widest uppercase text-[10px] mb-6">Resources</h3>
           <ul className="space-y-4 text-sm font-light">
-            <li><a href="#" className="hover:text-white transition-colors flex items-center gap-2">WCAG 2.2 Guide</a></li>
-            <li><a href="#" className="hover:text-white transition-colors flex items-center gap-2">API Documentation</a></li>
-            <li><a href="#" className="hover:text-white transition-colors flex items-center gap-2">Browser Extension</a></li>
-            <li><a href="#" className="hover:text-white transition-colors flex items-center gap-2">Compliance Blog</a></li>
+            <li><a href="#" className="hover:text-indigo-600 transition-colors flex items-center gap-2">WCAG 2.2 Guide</a></li>
+            <li><a href="#" className="hover:text-indigo-600 transition-colors flex items-center gap-2">API Documentation</a></li>
+            <li><a href="#" className="hover:text-indigo-600 transition-colors flex items-center gap-2">Browser Extension</a></li>
+            <li><a href="#" className="hover:text-indigo-600 transition-colors flex items-center gap-2">Compliance Blog</a></li>
           </ul>
         </motion.div>
 
         {/* --- COLUMN 4: CTA / Newsletter (Double Bezel) --- */}
         <motion.div variants={itemVariants} className="lg:col-span-4">
-          <div className="p-1.5 rounded-[2rem] bg-white/[0.02] border border-white/5 backdrop-blur-xl group overflow-hidden">
-            <div className="bg-[#0a0a0a] rounded-[calc(2rem-0.375rem)] border border-white/5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] p-6 md:p-8 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="p-1.5 rounded-[2rem] bg-slate-50/50 border border-slate-200/60 backdrop-blur-xl group overflow-hidden shadow-sm">
+            <div className="bg-white rounded-[calc(2rem-0.375rem)] border border-slate-200 p-6 md:p-8 relative overflow-hidden shadow-sm">
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               
-              <h3 className="text-white font-medium text-lg mb-2 relative z-10 tracking-tight">Stay Compliant.</h3>
-              <p className="text-white/40 text-xs mb-6 relative z-10 font-light leading-relaxed">
+              <h3 className="text-slate-900 font-medium text-lg mb-2 relative z-10 tracking-tight">Stay Compliant.</h3>
+              <p className="text-slate-500 text-xs mb-6 relative z-10 font-light leading-relaxed">
                 Get the latest updates on WCAG guidelines and AI accessibility tools delivered to your inbox.
               </p>
               
               <div className="relative z-10 flex flex-col gap-3">
                 <div className="relative flex items-center">
-                  <Mail className="absolute left-4 text-white/30" size={16} strokeWidth={1.5} />
+                  <Mail className="absolute left-4 text-slate-400" size={16} strokeWidth={1.5} />
                   <input 
                     type="email" 
                     placeholder="hello@domain.com" 
-                    className="w-full bg-[#111] border border-white/10 rounded-xl py-3 pl-11 pr-4 text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-light"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-sm text-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-light"
                   />
                 </div>
                 <motion.button 
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full bg-white text-black font-medium py-3 rounded-xl text-sm transition-colors flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:bg-gray-100"
+                  className="w-full bg-slate-900 text-white font-medium py-3 rounded-xl text-sm transition-colors flex items-center justify-center gap-2 shadow-md hover:bg-slate-800"
                 >
                   Subscribe <ArrowRight size={14} strokeWidth={2} />
                 </motion.button>
@@ -138,13 +138,13 @@ const Footer = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        className="max-w-7xl mx-auto px-6 md:px-12 mt-20 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-light text-white/40"
+        className="max-w-7xl mx-auto px-6 md:px-12 mt-20 pt-8 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-light text-slate-400"
       >
         <p>© {new Date().getFullYear()} AccessGuard.</p>
         <div className="flex items-center gap-6">
-          <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-          <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-          <a href="#" className="hover:text-white transition-colors">Accessibility Statement</a>
+          <a href="#" className="hover:text-slate-900 transition-colors">Privacy Policy</a>
+          <a href="#" className="hover:text-slate-900 transition-colors">Terms of Service</a>
+          <a href="#" className="hover:text-slate-900 transition-colors">Accessibility Statement</a>
         </div>
       </motion.div>
 
