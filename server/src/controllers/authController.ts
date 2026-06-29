@@ -140,3 +140,42 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
     res.status(500).json({ success: false, error: err.message });
   }
 };
+
+// @route GET /api/auth/oauth/callback
+export const oauthCallback = (req: Request, res: Response): void => {
+  const user = req.user as any;
+  if (!user) {
+    res.redirect(`${env.FRONTEND_URL}/login?error=OAuthFailed`);
+    return;
+  }
+
+  const token = generateToken(user.id);
+  const options: CookieOptions = {
+    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+  };
+
+  res
+    .cookie('accessguard_token', token, options)
+    .redirect(`${env.FRONTEND_URL}/dashboard`);
+};
+
+// @route GET /api/auth/me
+// Depends on protect middleware
+export const getMe = async (req: Request, res: Response): Promise<void> => {
+  const user = (req as any).user;
+  const token = req.cookies.accessguard_token || req.headers.authorization?.split(' ')[1];
+  
+  if (!user) {
+    res.status(401).json({ success: false, error: 'User not found' });
+    return;
+  }
+
+  res.status(200).json({
+    success: true,
+    token, // Send back token to hydrate frontend localStorage if needed
+    user: { id: user.id, name: user.name, email: user.email, provider: user.provider },
+  });
+};

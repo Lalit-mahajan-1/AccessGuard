@@ -4,6 +4,7 @@ import { join } from 'path';
 import urlRoutes from './routes/urlRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import cookieParser from 'cookie-parser';
+import passport from './config/passport.js';
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
+app.use(passport.initialize());
 
 // Health check endpoint (used by frontend to verify backend is alive)
 app.get('/api/health', (req, res) => {
