@@ -39,6 +39,7 @@ interface AnalyzeApiResponse {
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api',
   timeout: 300000, // 5 minutes
+  withCredentials: true, // 🔥 CRITICAL: Tells Axios to send HttpOnly cookies
   headers: {
     'Content-Type': 'application/json',
   },
@@ -60,18 +61,25 @@ api.interceptors.response.use(
     return response;
   },
   (error: AxiosError<ApiError>) => {
-    const message =
-      error.response?.data?.message ||
-      error.message ||
-      'An unexpected error occurred while connecting to the server.';
+    // Handle 401 Unauthorized globally
+    if (error.response?.status === 401) {
+      toast.error('Session expired. Please log in again.');
+      // Optional: Redirect to login page
+      // if (typeof window !== 'undefined') window.location.href = '/login';
+    } else {
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        'An unexpected error occurred while connecting to the server.';
 
-    console.error(`[API Error] ${message}`);
+      console.error(`[API Error] ${message}`);
 
-    toast.error(message, {
-      description: 'Backend is taking too long or is unreachable. Please check if the server is running.',
-    });
+      toast.error(message, {
+        description: 'Backend is taking too long or is unreachable. Please check if the server is running.',
+      });
+    }
 
-    return Promise.reject(new Error(message));
+    return Promise.reject(error);
   }
 );
 

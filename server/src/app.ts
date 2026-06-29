@@ -2,11 +2,17 @@ import express from 'express';
 import cors from 'cors';
 import { join } from 'path';
 import urlRoutes from './routes/urlRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true, // Crucial for cookies
+}));
 app.use(express.json());
+app.use(cookieParser());
 
 // Health check endpoint (used by frontend to verify backend is alive)
 app.get('/api/health', (req, res) => {
@@ -15,5 +21,6 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api', urlRoutes);
 app.use('/reports', express.static(join(process.cwd(), 'public', 'reports')));
+app.use('/api/auth', authRoutes);
 
 export default app;

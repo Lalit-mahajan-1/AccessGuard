@@ -6,3 +6,25 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+  GITHUB
+}
+
+model User {
+  id                  String       @id @default(uuid())
+  email               String       @unique
+  name                String?
+  password            String?      // Nullable for OAuth users
+  provider            AuthProvider @default(LOCAL)
+  providerId          String?      // Stores Google/Github ID
+  
+  // Password Reset
+  resetPasswordToken  String?
+  resetPasswordExpire DateTime?
+
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+}
