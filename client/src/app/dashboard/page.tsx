@@ -9,10 +9,12 @@ import { LoadingOverlay } from "@/components/ui/LoadingSpinner";
 import { useAuditMutation } from "@/hooks/useAudit";
 import { pingServer } from "@/lib/api";
 import type { AuditFormValues, AuditResponse } from "@/schemas/auditSchema";
-import { ArrowLeft, ScanEye, Code2, Wifi, WifiOff } from "lucide-react";
+import { ArrowLeft, ScanEye, Code2, Wifi, WifiOff, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function DashboardPage() {
   const auditMutation = useAuditMutation();
+  const { user, logout } = useAuth();
   const [auditedUrl, setAuditedUrl] = useState<string>("");
   const [auditedPages, setAuditedPages] = useState<Map<string, AuditResponse>>(new Map());
   const [serverOnline, setServerOnline] = useState<boolean | null>(null);
@@ -116,6 +118,27 @@ export default function DashboardPage() {
             >
               <Code2 className="w-4 h-4" />
             </a>
+
+            {user && (
+              <div className="flex items-center gap-3 border-l border-slate-200 pl-4">
+                {/* User Avatar Circle */}
+                <div 
+                  title={user.name || user.email}
+                  className="w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center font-semibold text-sm shadow-sm select-none transition-colors duration-200 cursor-default"
+                >
+                  {user.name ? user.name.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'U')}
+                </div>
+                
+                {/* Logout Button */}
+                <button
+                  onClick={logout}
+                  className="flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-rose-600 bg-white hover:bg-rose-50/50 px-3 py-1.5 rounded-xl border border-slate-200 hover:border-rose-200 transition-all shadow-sm"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>

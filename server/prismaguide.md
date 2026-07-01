@@ -11,6 +11,7 @@
 ## 🚀 Initial Setup (First Time Only)
 
 ### 1. Install dependencies
+
 ```bash
 cd server
 npm install
@@ -230,3 +231,4 @@ cd server
 git add PRISMA_GUIDE.md .env.example
 git commit -m "docs: add prisma setup guide for contributors"
 git push origin main
+```

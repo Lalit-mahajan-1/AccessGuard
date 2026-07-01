@@ -30,6 +30,8 @@ export default function LoginPage() {
       if (res.data.success && res.data.token) {
         toast.success("Authentication successful");
         login(res.data.token, res.data.user);
+      } else {
+        toast.error("Login succeeded but no session data received");
       }
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Login failed");

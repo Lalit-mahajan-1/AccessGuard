@@ -17,14 +17,30 @@ model User {
   id                  String       @id @default(uuid())
   email               String       @unique
   name                String?
-  password            String?      // Nullable for OAuth users
+  password            String?
   provider            AuthProvider @default(LOCAL)
-  providerId          String?      // Stores Google/Github ID
-  
-  // Password Reset
+  providerId          String?
+
   resetPasswordToken  String?
   resetPasswordExpire DateTime?
 
+  projects            Project[]    // 🔹 new relation
+
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
+}
+
+model Project {
+  id             String   @id @default(uuid())
+  githubRepo     String   // e.g. https://github.com/user/repo
+  prodLink       String   // e.g. https://myapp.com
+  frontendLang   String   // e.g. "react", "next", "vue"
+  backendLang    String   // e.g. "node", "python", "go"
+  runCommands    String[] // e.g. ["npm install", "npm run dev"]
+
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt      DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

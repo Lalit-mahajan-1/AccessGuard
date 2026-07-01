@@ -5,11 +5,13 @@ import urlRoutes from './routes/urlRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import cookieParser from 'cookie-parser';
 import passport from './config/passport.js';
+import projectRoutes from './routes/projectRoutes.js';
+
 
 const app = express();
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: 'http://localhost:3000',
   credentials: true, // Crucial for cookies
 }));
 app.use(express.json());
@@ -24,5 +26,6 @@ app.get('/api/health', (req, res) => {
 app.use('/api', urlRoutes);
 app.use('/reports', express.static(join(process.cwd(), 'public', 'reports')));
 app.use('/api/auth', authRoutes);
+app.use('/api/projects', projectRoutes);
 
 export default app;

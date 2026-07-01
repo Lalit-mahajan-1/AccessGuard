@@ -48,6 +48,10 @@ const api = axios.create({
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
+    const token = localStorage.getItem('accessguard_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url} at ${new Date().toLocaleTimeString()}`);
     return config;
   },
@@ -63,9 +67,17 @@ api.interceptors.response.use(
   (error: AxiosError<ApiError>) => {
     // Handle 401 Unauthorized globally
     if (error.response?.status === 401) {
-      toast.error('Session expired. Please log in again.');
-      // Optional: Redirect to login page
-      // if (typeof window !== 'undefined') window.location.href = '/login';
+      const hasLocalToken = typeof window !== 'undefined' && !!localStorage.getItem('accessguard_token');
+      const isAuthMe = error.config?.url?.includes('/auth/me');
+
+      if (hasLocalToken || !isAuthMe) {
+        toast.error('Session expired. Please log in again.');
+      }
+
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('accessguard_token');
+        localStorage.removeItem('accessguard_user');
+      }
     } else {
       const message =
         error.response?.data?.message ||
