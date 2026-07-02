@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
+import { ArrowLeft, Rocket, Link2, Code2, Terminal, Plus, CheckCircle2, Server } from "lucide-react";
+import Link from "next/link";
 
 export default function NewProjectPage() {
   const router = useRouter();
@@ -54,162 +56,199 @@ export default function NewProjectPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-8">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold mb-2">Add New Project</h1>
-        <p className="text-gray-400 mb-8">
-          Connect your GitHub repo & production URL for automated auditing.
-        </p>
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans relative overflow-x-hidden p-6 md:p-12">
+      {/* Background Mesh */}
+      <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-40">
+        <div className="absolute w-[60vw] h-[60vw] bg-indigo-50 rounded-full blur-[120px] -translate-y-1/4" />
+        <div className="absolute w-[50vw] h-[50vw] bg-violet-50 rounded-full blur-[100px] translate-x-1/4" />
+      </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* GitHub Repo */}
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              GitHub Repo URL
-            </label>
-            <input
-              type="url"
-              name="githubRepo"
-              value={form.githubRepo}
-              onChange={handleChange}
-              required
-              placeholder="https://github.com/user/repo.git"
-              className="w-full p-3 rounded-lg bg-gray-900 border border-gray-800 focus:border-blue-500 focus:outline-none"
-            />
-          </div>
+      <div className="relative z-10 max-w-2xl mx-auto">
+        <button
+          onClick={() => router.push('/dashboard')}
+          className="flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors mb-8 bg-white/60 backdrop-blur-xl border border-slate-200/60 px-4 py-2 rounded-full shadow-sm w-fit"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Dashboard
+        </button>
 
-          {/* Production Link */}
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Production URL
-            </label>
-            <input
-              type="url"
-              name="prodLink"
-              value={form.prodLink}
-              onChange={handleChange}
-              required
-              placeholder="https://yourapp.com"
-              className="w-full p-3 rounded-lg bg-gray-900 border border-gray-800 focus:border-blue-500 focus:outline-none"
-            />
-          </div>
-
-          {/* Frontend Language */}
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Frontend Framework
-            </label>
-            <select
-              name="frontendLang"
-              value={form.frontendLang}
-              onChange={handleChange}
-              required
-              className="w-full p-3 rounded-lg bg-gray-900 border border-gray-800 focus:border-blue-500 focus:outline-none"
-            >
-              <option value="">Select framework</option>
-              <option value="react">React</option>
-              <option value="next">Next.js</option>
-              <option value="vue">Vue</option>
-              <option value="angular">Angular</option>
-              <option value="svelte">Svelte</option>
-              <option value="vanilla">Vanilla JS</option>
-            </select>
-          </div>
-
-          {/* Backend Language */}
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Backend Language
-            </label>
-            <select
-              name="backendLang"
-              value={form.backendLang}
-              onChange={handleChange}
-              required
-              className="w-full p-3 rounded-lg bg-gray-900 border border-gray-800 focus:border-blue-500 focus:outline-none"
-            >
-              <option value="">Select language</option>
-              <option value="node">Node.js</option>
-              <option value="python">Python</option>
-              <option value="go">Go</option>
-              <option value="ruby">Ruby</option>
-              <option value="java">Java</option>
-              <option value="php">PHP</option>
-            </select>
-          </div>
-
-          {/* Run Commands */}
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Run Commands{" "}
-              <span className="text-gray-500">(comma-separated)</span>
-            </label>
-            <input
-              type="text"
-              name="runCommands"
-              value={form.runCommands}
-              onChange={handleChange}
-              required
-              placeholder="npm install, npm run dev"
-              className="w-full p-3 rounded-lg bg-gray-900 border border-gray-800 focus:border-blue-500 focus:outline-none"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              e.g. <code>npm install, npm run build, npm start</code>
+        <div className="bg-white/70 backdrop-blur-xl border border-slate-200/80 rounded-[2rem] shadow-[0_20px_60px_rgba(0,0,0,0.03)] overflow-hidden">
+          <div className="p-8 md:p-10 border-b border-slate-200/50 bg-white/50">
+            <h1 className="text-3xl font-medium tracking-tight text-slate-900 mb-2 flex items-center gap-3">
+              <div className="bg-indigo-50 text-indigo-600 p-2.5 rounded-xl border border-indigo-100">
+                <Rocket className="w-6 h-6" />
+              </div>
+              Add New Project
+            </h1>
+            <p className="text-slate-500 text-lg font-light pl-[3.25rem]">
+              Connect your GitHub repository to enable automated accessibility auditing.
             </p>
           </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 font-semibold transition"
-          >
-            {loading ? "Setting up container..." : "Create Project"}
-          </button>
-        </form>
-
-        {/* Error */}
-        {error && (
-          <div className="mt-6 p-4 rounded-lg bg-red-950 border border-red-800 text-red-200">
-            ❌ {error}
-          </div>
-        )}
-
-        {/* Success Result */}
-        {result && (
-          <div className="mt-6 p-4 rounded-lg bg-green-950 border border-green-800">
-            <h3 className="font-bold text-green-300 mb-3">
-              ✅ Project Created
-            </h3>
-
-            <div className="text-sm space-y-2">
-              <div>
-                <span className="text-gray-400">Project ID:</span>{" "}
-                {result.project.id}
+          <div className="p-8 md:p-10">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* GitHub Repo */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                  <Code2 className="w-4 h-4 text-slate-400" />
+                  GitHub Repository URL
+                </label>
+                <input
+                  type="url"
+                  name="githubRepo"
+                  value={form.githubRepo}
+                  onChange={handleChange}
+                  required
+                  placeholder="https://github.com/user/repo.git"
+                  className="w-full p-3.5 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition-all shadow-sm"
+                />
               </div>
-              <div>
-                <span className="text-gray-400">Container:</span>{" "}
-                {result.runResult.containerName}
+
+              {/* Production Link */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                  <Link2 className="w-4 h-4 text-slate-400" />
+                  Production URL
+                </label>
+                <input
+                  type="url"
+                  name="prodLink"
+                  value={form.prodLink}
+                  onChange={handleChange}
+                  required
+                  placeholder="https://yourapp.com"
+                  className="w-full p-3.5 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition-all shadow-sm"
+                />
               </div>
-            </div>
 
-            <div className="mt-4">
-              <h4 className="text-sm font-semibold text-gray-300 mb-2">
-                Logs:
-              </h4>
-              <pre className="bg-black p-3 rounded text-xs text-green-400 overflow-x-auto">
-                {result.runResult.logs.join("\n")}
-              </pre>
-            </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Frontend Language */}
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                    <Server className="w-4 h-4 text-slate-400" />
+                    Frontend Framework
+                  </label>
+                  <select
+                    name="frontendLang"
+                    value={form.frontendLang}
+                    onChange={handleChange}
+                    required
+                    className="w-full p-3.5 rounded-xl bg-white border border-slate-200 text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition-all shadow-sm appearance-none"
+                  >
+                    <option value="">Select framework</option>
+                    <option value="react">React</option>
+                    <option value="next">Next.js</option>
+                    <option value="vue">Vue</option>
+                    <option value="angular">Angular</option>
+                    <option value="svelte">Svelte</option>
+                    <option value="vanilla">Vanilla JS</option>
+                  </select>
+                </div>
 
-            <button
-              onClick={() => router.push("/projects")}
-              className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm"
-            >
-              View All Projects →
-            </button>
+                {/* Backend Language */}
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                    <Server className="w-4 h-4 text-slate-400" />
+                    Backend Language
+                  </label>
+                  <select
+                    name="backendLang"
+                    value={form.backendLang}
+                    onChange={handleChange}
+                    required
+                    className="w-full p-3.5 rounded-xl bg-white border border-slate-200 text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition-all shadow-sm appearance-none"
+                  >
+                    <option value="">Select language</option>
+                    <option value="node">Node.js</option>
+                    <option value="python">Python</option>
+                    <option value="go">Go</option>
+                    <option value="ruby">Ruby</option>
+                    <option value="java">Java</option>
+                    <option value="php">PHP</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Run Commands */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                  <Terminal className="w-4 h-4 text-slate-400" />
+                  Run Commands <span className="text-slate-400 font-normal">(comma-separated)</span>
+                </label>
+                <input
+                  type="text"
+                  name="runCommands"
+                  value={form.runCommands}
+                  onChange={handleChange}
+                  required
+                  placeholder="npm install, npm run build, npm start"
+                  className="w-full p-3.5 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition-all shadow-sm"
+                />
+              </div>
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-4 mt-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 disabled:text-slate-500 text-white font-medium transition-colors shadow-sm flex justify-center items-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Setting up container...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-5 h-5" />
+                    Deploy Project
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Error */}
+            {error && (
+              <div className="mt-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 flex items-start gap-3">
+                <div className="p-1 bg-rose-100 rounded-lg shrink-0">
+                  <span className="text-rose-600">❌</span>
+                </div>
+                <div className="text-sm font-medium pt-0.5">{error}</div>
+              </div>
+            )}
+
+            {/* Success Result */}
+            {result && (
+              <div className="mt-8 p-6 rounded-2xl bg-emerald-50 border border-emerald-200 overflow-hidden relative">
+                <div className="flex items-center gap-3 mb-6 relative z-10">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+                  <h3 className="text-xl font-medium tracking-tight text-emerald-900">
+                    Project Deployed
+                  </h3>
+                </div>
+
+                <div className="text-sm space-y-3 relative z-10 bg-white/60 p-4 rounded-xl border border-emerald-100 mb-6">
+                  <div className="flex items-center justify-between">
+                    <span className="text-emerald-700/70 font-medium">Project ID</span>
+                    <span className="text-emerald-900 font-mono text-xs bg-emerald-100 px-2 py-1 rounded">{result.project.id}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-emerald-700/70 font-medium">Container</span>
+                    <span className="text-emerald-900 font-mono text-xs bg-emerald-100 px-2 py-1 rounded">{result.runResult.containerName}</span>
+                  </div>
+                </div>
+
+                <div className="relative z-10">
+                  <h4 className="text-sm font-semibold text-emerald-900 mb-2 flex items-center gap-2">
+                    <Terminal className="w-4 h-4" /> Build Logs
+                  </h4>
+                  <pre className="bg-emerald-950 p-4 rounded-xl text-xs text-emerald-400 overflow-x-auto font-mono leading-relaxed border border-emerald-900 shadow-inner">
+                    {result.runResult.logs.join("\n")}
+                  </pre>
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

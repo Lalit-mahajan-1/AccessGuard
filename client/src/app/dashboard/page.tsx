@@ -225,9 +225,15 @@ export default function DashboardPage() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {projects.map((project: any) => (
-                      <div key={project.id} className="bg-white/70 backdrop-blur-xl border border-slate-200 hover:border-indigo-200 rounded-2xl p-5 shadow-sm transition-all hover:shadow-md group">
-                        <div className="flex items-start justify-between mb-4">
+                    {projects.map((project: any, index: number) => (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1, duration: 0.4 }}
+                        key={project.id} 
+                        className="bg-white/80 backdrop-blur-xl border border-slate-200/80 hover:border-indigo-300 rounded-[1.5rem] p-6 shadow-sm hover:shadow-xl transition-all duration-300 group hover:-translate-y-1"
+                      >
+                        <div className="flex items-start justify-between mb-5">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
                               <GitBranch className="w-5 h-5" />
@@ -267,28 +273,32 @@ export default function DashboardPage() {
                             </button>
                           </div>
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
                 )}
               </motion.div>
             )}
 
-            <div className="py-10 flex flex-col items-center justify-center text-center border-t border-slate-200">
+            <div className="py-16 flex flex-col items-center justify-center text-center mt-12 relative">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-indigo-50/50 pointer-events-none rounded-[3rem]" />
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="max-w-2xl w-full"
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="max-w-3xl w-full relative z-10 bg-white/60 backdrop-blur-2xl border border-white/80 shadow-[0_30px_60px_rgba(0,0,0,0.04)] rounded-[2.5rem] p-8 md:p-12"
             >
-              <h2 className="text-4xl font-medium tracking-tight text-slate-900 mb-4">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 mb-6 border border-indigo-100 shadow-sm">
+                <ScanEye className="w-6 h-6" />
+              </div>
+              <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-slate-900 mb-4">
                 Audit your platform
               </h2>
-              <p className="text-slate-500 mb-10 text-lg font-light">
-                Enter a URL to generate a comprehensive accessibility and performance report.
+              <p className="text-slate-500 mb-10 text-lg font-light max-w-xl mx-auto">
+                Enter a URL to generate a comprehensive accessibility and performance report powered by our intelligence engine.
               </p>
               
-              <div className="w-full">
+              <div className="w-full relative">
                 <AuditForm onSubmit={handleSubmit} isPending={auditMutation.isPending} />
               </div>
             </motion.div>

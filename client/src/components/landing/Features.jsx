@@ -75,7 +75,7 @@ const Features = () => {
   }, []);
 
   return (
-    <section ref={containerRef} className="h-screen bg-slate-50 flex items-center justify-center overflow-hidden relative" id="features">
+    <section ref={containerRef} className="h-screen bg-[#fafafa] flex items-center justify-center overflow-hidden relative" id="features">
       
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(rgba(0,0,0,0.1) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
@@ -84,11 +84,12 @@ const Features = () => {
         
         {/* Left Side text */}
         <div className="w-full md:w-1/3 text-slate-900">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-500 font-medium text-xs tracking-widest uppercase mb-6 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200/60 text-slate-500 font-medium text-xs tracking-widest uppercase mb-6 shadow-sm backdrop-blur-md">
             Capabilities
           </div>
-          <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6 leading-tight">
-            Powerful tools for <span className="text-slate-400">inclusive design.</span>
+          <h2 className="text-4xl md:text-5xl font-medium tracking-tight mb-6 leading-tight">
+            <span className="bg-clip-text text-transparent bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-800">Powerful tools for </span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-slate-400 to-slate-500">inclusive design.</span>
           </h2>
           <p className="text-slate-500 text-lg leading-relaxed font-light">
             Stop digging through raw audit reports. Our platform translates complex WCAG guidelines into actionable, visual, and intelligent workflows.

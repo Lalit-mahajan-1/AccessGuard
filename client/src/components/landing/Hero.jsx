@@ -12,10 +12,15 @@ const Hero = ({ onRunAudit }) => {
   useLayoutEffect(() => {
     let ctx = gsap.context(() => {
       
-      // --- 1. INITIAL LOAD ANIMATION ---
-      gsap.fromTo(".intro-item", 
-        { y: 40, autoAlpha: 0, filter: "blur(10px)" },
-        { y: 0, autoAlpha: 1, filter: "blur(0px)", duration: 1.2, stagger: 0.15, ease: "power3.out", delay: 0.2 }
+      // --- 1. INITIAL LOAD ANIMATION (TEXT REVEAL) ---
+      gsap.fromTo(".reveal-text", 
+        { y: "110%", rotateZ: 2, opacity: 0 },
+        { y: "0%", rotateZ: 0, opacity: 1, duration: 1.4, stagger: 0.15, ease: "power4.out", delay: 0.2 }
+      );
+      
+      gsap.fromTo(".intro-badge, .intro-p", 
+        { y: 30, opacity: 0, filter: "blur(10px)" },
+        { y: 0, opacity: 1, filter: "blur(0px)", duration: 1.2, stagger: 0.15, ease: "power3.out", delay: 0.4 }
       );
 
       const pulse = gsap.to(".portal-glow", {
@@ -130,7 +135,7 @@ const Hero = ({ onRunAudit }) => {
   return (
     <section 
       ref={containerRef} 
-      className="relative w-full h-screen bg-white overflow-hidden perspective-[2000px] flex flex-col items-center justify-center font-sans text-slate-900"
+      className="relative w-full h-screen bg-[#fafafa] overflow-hidden perspective-[2000px] flex flex-col items-center justify-center font-sans text-slate-900"
     >
       {/* Background Layer: Soft Mesh Glows */}
       <div className="bg-mesh absolute inset-0 opacity-[0.8] pointer-events-none flex items-center justify-center">
@@ -143,14 +148,14 @@ const Hero = ({ onRunAudit }) => {
 
         {/* --- ACT 1: INITIAL GREETING --- */}
         <div className="intro-wrapper absolute z-50 flex flex-col items-center text-center w-[90vw] max-w-5xl will-change-transform">
-          <div className="intro-item inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-slate-500 font-medium text-xs tracking-[0.2em] uppercase mb-8 invisible shadow-sm">
+          <div className="intro-badge inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-slate-200/60 text-slate-500 font-medium text-xs tracking-[0.2em] uppercase mb-8 shadow-sm backdrop-blur-md invisible">
             <Sparkles size={14} className="text-indigo-500" /> Advanced WCAG 2.2 Intelligence
           </div>
-          <h1 className="intro-item text-5xl md:text-7xl lg:text-[7rem] font-medium tracking-tight text-slate-900 leading-[1.05] mb-8 invisible">
-            Audit the web.<br />
-            <span className="text-slate-400">Empower everyone.</span>
+          <h1 className="text-5xl md:text-7xl lg:text-[7rem] font-medium tracking-tight leading-[1.05] mb-8 flex flex-col items-center">
+            <div className="overflow-hidden pb-2"><div className="reveal-text bg-clip-text text-transparent bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-800">Audit the web.</div></div>
+            <div className="overflow-hidden pb-2"><div className="reveal-text bg-clip-text text-transparent bg-gradient-to-r from-slate-400 to-slate-500">Empower everyone.</div></div>
           </h1>
-          <p className="intro-item text-lg md:text-xl text-slate-500 font-normal max-w-2xl mb-8 invisible">
+          <p className="intro-p text-lg md:text-xl text-slate-500 font-normal max-w-2xl mb-8 invisible">
             Instantly parse DOM structures, contrast matrices, and ARIA topologies to secure perfect accessibility compliance in milliseconds.
           </p>
         </div>
