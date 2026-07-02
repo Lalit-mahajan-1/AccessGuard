@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import api from "@/lib/api";
 
 export default function NewProjectPage() {
   const router = useRouter();
@@ -30,34 +31,23 @@ export default function NewProjectPage() {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem("token"); // adjust to your auth setup
+      const res = await api.post('/projects', {
+        ...form,
+        runCommands: form.runCommands
+          .split(",")
+          .map((c) => c.trim())
+          .filter(Boolean),
+      });
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/projects`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...form,
-            runCommands: form.runCommands
-              .split(",")
-              .map((c) => c.trim())
-              .filter(Boolean),
-          }),
-        },
-      );
+      const data = res.data;
 
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
+      if (!data.success) {
         throw new Error(data.error || "Something went wrong");
       }
 
       setResult(data);
     } catch (err: any) {
-      setError(err.message);
+      setError(err.response?.data?.error || err.message);
     } finally {
       setLoading(false);
     }

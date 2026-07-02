@@ -7,10 +7,11 @@ import { AuditResults } from "@/components/results/AuditResult";
 import { CrawlerSection } from "@/components/CrawlerSection";
 import { LoadingOverlay } from "@/components/ui/LoadingSpinner";
 import { useAuditMutation } from "@/hooks/useAudit";
-import { pingServer } from "@/lib/api";
+import api, { pingServer } from "@/lib/api";
 import type { AuditFormValues, AuditResponse } from "@/schemas/auditSchema";
-import { ArrowLeft, ScanEye, Code2, Wifi, WifiOff, LogOut } from "lucide-react";
+import { ArrowLeft, ScanEye, Code2, Wifi, WifiOff, LogOut, Plus, GitBranch, ExternalLink, Activity } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const auditMutation = useAuditMutation();
@@ -26,6 +27,10 @@ export default function DashboardPage() {
     ? auditedPages.get(normalizeUrl(activeReportUrl))!
     : auditMutation.data;
 
+  // Projects state
+  const [projects, setProjects] = useState<any[]>([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
+
   // Check if backend is reachable on mount
   useEffect(() => {
     pingServer().then((ok) => {
@@ -35,6 +40,25 @@ export default function DashboardPage() {
       }
     });
   }, []);
+
+  // Fetch projects
+  useEffect(() => {
+    if (user) {
+      const fetchProjects = async () => {
+        try {
+          const res = await api.get('/projects');
+          if (res.data.success) {
+            setProjects(res.data.projects);
+          }
+        } catch (error) {
+          console.error("Failed to fetch projects", error);
+        } finally {
+          setLoadingProjects(false);
+        }
+      };
+      fetchProjects();
+    }
+  }, [user]);
 
   const handleSubmit = (data: AuditFormValues) => {
     setAuditedUrl(data.url);
@@ -161,7 +185,96 @@ export default function DashboardPage() {
         )}
 
         {!hasResults ? (
-          <div className="py-20 flex flex-col items-center justify-center text-center">
+          <>
+            {/* Projects Section */}
+            {!auditMutation.isPending && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-20"
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-medium tracking-tight text-slate-900">Your Projects</h2>
+                  <Link
+                    href="/projects/new"
+                    className="flex items-center gap-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-xl shadow-sm transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Project
+                  </Link>
+                </div>
+                
+                {loadingProjects ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[1, 2, 3].map(i => (
+                      <div key={i} className="h-48 bg-white/50 backdrop-blur border border-slate-200 rounded-2xl animate-pulse" />
+                    ))}
+                  </div>
+                ) : projects.length === 0 ? (
+                  <div className="text-center py-12 bg-white/50 backdrop-blur border border-slate-200 rounded-2xl">
+                    <GitBranch className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-slate-900 mb-1">No projects yet</h3>
+                    <p className="text-slate-500 mb-4">Connect a repository to get started with automated auditing.</p>
+                    <Link
+                      href="/projects/new"
+                      className="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-xl transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Connect Repository
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {projects.map((project: any) => (
+                      <div key={project.id} className="bg-white/70 backdrop-blur-xl border border-slate-200 hover:border-indigo-200 rounded-2xl p-5 shadow-sm transition-all hover:shadow-md group">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+                              <GitBranch className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <h3 className="font-medium text-slate-900 line-clamp-1" title={project.githubRepo}>
+                                {project.githubRepo.split('/').pop()?.replace('.git', '') || 'Project'}
+                              </h3>
+                              <p className="text-xs text-slate-500">{project.frontendLang} • {project.backendLang}</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 text-sm text-slate-600">
+                            <ExternalLink className="w-4 h-4 text-slate-400" />
+                            <a href={project.prodLink} target="_blank" rel="noreferrer" className="hover:text-indigo-600 truncate">
+                              {project.prodLink.replace(/^https?:\/\//, '')}
+                            </a>
+                          </div>
+                          
+                          <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                              Active
+                            </span>
+                            
+                            <button
+                              onClick={() => {
+                                setAuditedUrl(project.prodLink);
+                                auditMutation.mutate(project.prodLink);
+                              }}
+                              className="text-xs font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
+                            >
+                              <Activity className="w-3.5 h-3.5" />
+                              Run Audit
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            <div className="py-10 flex flex-col items-center justify-center text-center border-t border-slate-200">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -179,7 +292,8 @@ export default function DashboardPage() {
                 <AuditForm onSubmit={handleSubmit} isPending={auditMutation.isPending} />
               </div>
             </motion.div>
-          </div>
+            </div>
+          </>
         ) : (
           <motion.div 
             initial={{ opacity: 0 }}

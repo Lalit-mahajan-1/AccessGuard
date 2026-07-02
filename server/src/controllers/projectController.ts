@@ -1,27 +1,11 @@
 import type { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { cloneAndRun, stopContainer } from '../services/dockerService.js';
+import type { AuthRequest } from '../middleware/authMiddleware.js';
 
 const prisma = new PrismaClient();
 
-// 🔹 Temp dev user — replace when auth is ready
-const DEV_USER_ID = 'dev-user-id';
-
-// Ensure dev user exists on startup
-const ensureDevUser = async () => {
-  await prisma.user.upsert({
-    where: { id: DEV_USER_ID },
-    update: {},
-    create: {
-      id: DEV_USER_ID,
-      email: 'dev@local.test',
-      name: 'Dev User',
-    },
-  });
-};
-ensureDevUser().catch(console.error);
-
-export const createProject = async (req: Request, res: Response): Promise<void> => {
+export const createProject = async (req: AuthRequest, res: Response): Promise<void> => {
   const { githubRepo, prodLink, frontendLang, backendLang, runCommands } = req.body;
 
   if (!githubRepo || !prodLink || !frontendLang || !backendLang || !Array.isArray(runCommands)) {
@@ -39,7 +23,7 @@ export const createProject = async (req: Request, res: Response): Promise<void> 
         frontendLang,
         backendLang,
         runCommands,
-        userId: DEV_USER_ID,
+        userId: req.user!.id,
       },
     });
 
@@ -51,9 +35,9 @@ export const createProject = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-export const listProjects = async (_req: Request, res: Response): Promise<void> => {
+export const listProjects = async (req: AuthRequest, res: Response): Promise<void> => {
   const projects = await prisma.project.findMany({
-    where: { userId: DEV_USER_ID },
+    where: { userId: req.user.id },
     orderBy: { createdAt: 'desc' },
   });
   res.json({ success: true, projects });

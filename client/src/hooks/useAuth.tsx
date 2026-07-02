@@ -67,15 +67,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Centralized Route Protection & Automatic Login Redirection
   useEffect(() => {
     if (!isAuthLoading) {
-      const publicPaths = ['/login', '/register', '/forgot-password', '/reset-password', '/'];
-      const isPublicPath = publicPaths.some(path => {
-        if (path === '/') return pathname === '/';
-        return pathname.startsWith(path);
-      });
+      const authPaths = ['/login', '/register', '/forgot-password', '/reset-password'];
+      const isAuthPath = authPaths.some(path => pathname.startsWith(path));
+      const isNeutralPath = pathname === '/';
 
-      if (user && isPublicPath) {
+      if (user && isAuthPath) {
         router.push('/dashboard');
-      } else if (!user && !isPublicPath) {
+      } else if (!user && !isAuthPath && !isNeutralPath) {
         router.push('/login');
       }
     }
