@@ -76,4 +76,14 @@ export const destroyContainer = async (containerName: string) => {
   }
 };
 
+export const cloneRepo = async ({ githubRepo, containerName }: { githubRepo: string; containerName: string }) => {
+  await execAsync(`docker run -d --name ${containerName} --memory=512m --cpus=0.5 node:20-slim sleep infinity`);
+  await execAsync(`docker exec ${containerName} sh -c "apt-get update -qq && apt-get install -y git -qq && git clone ${githubRepo} /app"`);
+};
+
+export const runInContainer = async (containerName: string, command: string) => {
+  return await execAsync(`docker exec ${containerName} sh -c "${command}"`);
+};
+
+
 export const stopContainer = destroyContainer;
