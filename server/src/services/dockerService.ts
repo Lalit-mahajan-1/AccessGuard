@@ -82,8 +82,9 @@ export const cloneRepo = async ({ githubRepo, containerName }: { githubRepo: str
 };
 
 export const runInContainer = async (containerName: string, command: string) => {
-  return await execAsync(`docker exec ${containerName} sh -c "${command}"`);
+  return await execAsync(`docker exec ${containerName} sh -c "${command}"`, {
+    maxBuffer: 10 * 1024 * 1024 // 10MB
+  });
 };
-
 
 export const stopContainer = destroyContainer;

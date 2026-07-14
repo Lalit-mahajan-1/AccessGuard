@@ -5,7 +5,6 @@ import urlRoutes from './routes/urlRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import cookieParser from 'cookie-parser';
 import passport from './config/passport.js';
-import projectRoutes from './routes/projectRoutes.js';
 import repoRoutes from './routes/repoRoutes.js'
 
 const app = express();
@@ -26,7 +25,6 @@ app.get('/api/health', (req, res) => {
 app.use('/api', urlRoutes);
 app.use('/reports', express.static(join(process.cwd(), 'public', 'reports')));
 app.use('/api/auth', authRoutes);
-app.use('/api/projects', projectRoutes);
 app.use('/api/repo',repoRoutes);
 
 

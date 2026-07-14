@@ -15,13 +15,10 @@ export default function NewProjectPage() {
   const [form, setForm] = useState({
     githubRepo: "",
     prodLink: "",
-    frontendLang: "",
-    backendLang: "",
-    runCommands: "", // comma-separated in UI, split before send
   });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -33,12 +30,9 @@ export default function NewProjectPage() {
     setLoading(true);
 
     try {
-      const res = await api.post('/projects', {
-        ...form,
-        runCommands: form.runCommands
-          .split(",")
-          .map((c) => c.trim())
-          .filter(Boolean),
+      const res = await api.post('/repo/detect', {
+        githubRepo: form.githubRepo,
+        prodLink: form.prodLink,
       });
 
       const data = res.data;
@@ -47,7 +41,7 @@ export default function NewProjectPage() {
         throw new Error(data.error || "Something went wrong");
       }
 
-      setResult(data);
+      router.push(`/projects/${data.project.id}`);
     } catch (err: any) {
       setError(err.response?.data?.error || err.message);
     } finally {
@@ -121,71 +115,6 @@ export default function NewProjectPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Frontend Language */}
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                    <Server className="w-4 h-4 text-slate-400" />
-                    Frontend Framework
-                  </label>
-                  <select
-                    name="frontendLang"
-                    value={form.frontendLang}
-                    onChange={handleChange}
-                    required
-                    className="w-full p-3.5 rounded-xl bg-white border border-slate-200 text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition-all shadow-sm appearance-none"
-                  >
-                    <option value="">Select framework</option>
-                    <option value="react">React</option>
-                    <option value="next">Next.js</option>
-                    <option value="vue">Vue</option>
-                    <option value="angular">Angular</option>
-                    <option value="svelte">Svelte</option>
-                    <option value="vanilla">Vanilla JS</option>
-                  </select>
-                </div>
-
-                {/* Backend Language */}
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                    <Server className="w-4 h-4 text-slate-400" />
-                    Backend Language
-                  </label>
-                  <select
-                    name="backendLang"
-                    value={form.backendLang}
-                    onChange={handleChange}
-                    required
-                    className="w-full p-3.5 rounded-xl bg-white border border-slate-200 text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition-all shadow-sm appearance-none"
-                  >
-                    <option value="">Select language</option>
-                    <option value="node">Node.js</option>
-                    <option value="python">Python</option>
-                    <option value="go">Go</option>
-                    <option value="ruby">Ruby</option>
-                    <option value="java">Java</option>
-                    <option value="php">PHP</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Run Commands */}
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                  <Terminal className="w-4 h-4 text-slate-400" />
-                  Run Commands <span className="text-slate-400 font-normal">(comma-separated)</span>
-                </label>
-                <input
-                  type="text"
-                  name="runCommands"
-                  value={form.runCommands}
-                  onChange={handleChange}
-                  required
-                  placeholder="npm install, npm run build, npm start"
-                  className="w-full p-3.5 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition-all shadow-sm"
-                />
-              </div>
-
               {/* Submit */}
               <button
                 type="submit"
@@ -195,12 +124,12 @@ export default function NewProjectPage() {
                 {loading ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Setting up container...
+                    Detecting structure...
                   </>
                 ) : (
                   <>
                     <Plus className="w-5 h-5" />
-                    Deploy Project
+                    Add Project
                   </>
                 )}
               </button>
@@ -213,38 +142,6 @@ export default function NewProjectPage() {
                   <span className="text-rose-600">❌</span>
                 </div>
                 <div className="text-sm font-medium pt-0.5">{error}</div>
-              </div>
-            )}
-
-            {/* Success Result */}
-            {result && (
-              <div className="mt-8 p-6 rounded-2xl bg-emerald-50 border border-emerald-200 overflow-hidden relative">
-                <div className="flex items-center gap-3 mb-6 relative z-10">
-                  <CheckCircle2 className="w-6 h-6 text-emerald-600" />
-                  <h3 className="text-xl font-medium tracking-tight text-emerald-900">
-                    Project Deployed
-                  </h3>
-                </div>
-
-                <div className="text-sm space-y-3 relative z-10 bg-white/60 p-4 rounded-xl border border-emerald-100 mb-6">
-                  <div className="flex items-center justify-between">
-                    <span className="text-emerald-700/70 font-medium">Project ID</span>
-                    <span className="text-emerald-900 font-mono text-xs bg-emerald-100 px-2 py-1 rounded">{result.project.id}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-emerald-700/70 font-medium">Container</span>
-                    <span className="text-emerald-900 font-mono text-xs bg-emerald-100 px-2 py-1 rounded">{result.runResult.containerName}</span>
-                  </div>
-                </div>
-
-                <div className="relative z-10">
-                  <h4 className="text-sm font-semibold text-emerald-900 mb-2 flex items-center gap-2">
-                    <Terminal className="w-4 h-4" /> Build Logs
-                  </h4>
-                  <pre className="bg-emerald-950 p-4 rounded-xl text-xs text-emerald-400 overflow-x-auto font-mono leading-relaxed border border-emerald-900 shadow-inner">
-                    {result.runResult.logs.join("\n")}
-                  </pre>
-                </div>
               </div>
             )}
           </div>

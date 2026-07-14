@@ -25,6 +25,7 @@ model User {
   resetPasswordExpire DateTime?
 
   projects            Project[]    // 🔹 new relation
+  audits              Audit[]      // 🔹 new relation
 
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
@@ -34,13 +35,26 @@ model Project {
   id             String   @id @default(uuid())
   githubRepo     String   // e.g. https://github.com/user/repo
   prodLink       String   // e.g. https://myapp.com
-  frontendLang   String   // e.g. "react", "next", "vue"
-  backendLang    String   // e.g. "node", "python", "go"
-  runCommands    String[] // e.g. ["npm install", "npm run dev"]
+  meta           Json?    // Stores detect response metadata (type, projects, etc.)
+  tree           Json?    // Stores repository file tree list
 
   userId         String
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  audits         Audit[]  // 🔹 new relation
+
   createdAt      DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  updatedAt      DateTime @updatedAt
+}
+
+model Audit {
+  id         String   @id @default(uuid())
+  projectId  String
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prodLink   String
+  response   Json     // Stores play audit response JSON
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
