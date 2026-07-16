@@ -116,12 +116,14 @@ const Footer = () => {
                     type="email" 
                     placeholder="hello@domain.com" 
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-sm text-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-light"
+                    suppressHydrationWarning
                   />
                 </div>
                 <motion.button 
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="w-full bg-slate-900 text-white font-medium py-3 rounded-xl text-sm transition-colors flex items-center justify-center gap-2 shadow-md hover:bg-slate-800"
+                  suppressHydrationWarning
                 >
                   Subscribe <ArrowRight size={14} strokeWidth={2} />
                 </motion.button>
