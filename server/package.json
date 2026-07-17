@@ -17,6 +17,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@langchain/core": "^1.2.3",
+    "@langchain/langgraph": "^1.4.8",
     "@prisma/client": "^6.19.3",
     "axe-core": "^4.12.1",
     "bcryptjs": "^3.0.3",

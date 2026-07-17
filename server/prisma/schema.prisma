@@ -26,6 +26,7 @@ model User {
 
   projects            Project[]    // 🔹 new relation
   audits              Audit[]      // 🔹 new relation
+  actionItems         ActionItem[] // 🔹 new relation
 
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
@@ -42,6 +43,7 @@ model Project {
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   audits         Audit[]  // 🔹 new relation
+  actionItems    ActionItem[] // 🔹 new relation
 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -55,6 +57,28 @@ model Audit {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   prodLink   String
   response   Json     // Stores play audit response JSON
+  actionItems ActionItem[] // 🔹 new relation
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model ActionItem {
+  id        String   @id @default(uuid())
+  task      String
+  file      String
+  type      String   // e.g. "accessibility", "security", "performance", "seo"
+  priority  String   // e.g. "critical", "high", "medium", "low"
+  issue     String
+  fix       String
+  status    String   @default("pending") // e.g. "pending", "in-progress", "completed"
+
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  auditId   String
+  audit     Audit    @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -152,6 +152,12 @@ export default function ProjectDashboardPage() {
   const [plan, setPlan] = useState<any[] | null>(null);
   const [planningError, setPlanningError] = useState("");
 
+  // Agent pipeline execution states
+  const [executingPipeline, setExecutingPipeline] = useState(false);
+  const [pipelineError, setPipelineError] = useState("");
+  const [submittingPr, setSubmittingPr] = useState(false);
+  const [prUrl, setPrUrl] = useState("");
+
   const [searchDep, setSearchDep] = useState("");
   const [expandedDeps, setExpandedDeps] = useState<Record<string, boolean>>({});
 
@@ -234,6 +240,111 @@ export default function ProjectDashboardPage() {
       toast.error("Failed to generate plan");
     } finally {
       setPlanning(false);
+    }
+  };
+
+  // Load stored action items when active audit changes
+  useEffect(() => {
+    if (activeAudit) {
+      const fetchPlan = async () => {
+        try {
+          const res = await api.get(`/action-items?auditId=${activeAudit.id}`);
+          if (res.data.success) {
+            setPlan(res.data.actionItems);
+          }
+        } catch (err: any) {
+          console.error("Failed to load plan for this audit", err);
+        }
+      };
+      fetchPlan();
+    } else {
+      setPlan(null);
+    }
+  }, [activeAudit]);
+
+  const handleDeleteActionItem = async (itemId: string) => {
+    if (!confirm("Are you sure you want to delete this action item?")) return;
+    try {
+      const res = await api.delete(`/action-items/${itemId}`);
+      if (res.data.success) {
+        toast.success("Action item deleted");
+        setPlan((prev) => (prev ? prev.filter((item) => item.id !== itemId) : null));
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || err.message || "Failed to delete action item");
+    }
+  };
+
+  // Poll action items status during pipeline run
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (executingPipeline && activeAudit) {
+      interval = setInterval(async () => {
+        try {
+          const res = await api.get(`/action-items?auditId=${activeAudit.id}`);
+          if (res.data.success) {
+            const items = res.data.actionItems;
+            setPlan(items);
+
+            // Turn off execution status when all items are done (completed or failed)
+            const hasActiveTasks = items.some(
+              (item: any) => item.status === "pending" || item.status === "in-progress"
+            );
+            if (!hasActiveTasks && items.length > 0) {
+              setExecutingPipeline(false);
+              toast.success("Execution pipeline complete!");
+            }
+          }
+        } catch (err) {
+          console.error("Error polling actions status", err);
+        }
+      }, 2000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [executingPipeline, activeAudit]);
+
+  const handleExecutePipeline = async () => {
+    if (!activeAudit) return;
+    setExecutingPipeline(true);
+    setPipelineError("");
+    setPrUrl("");
+    try {
+      const res = await api.post("/agent/execute-pipeline", {
+        projectId: id,
+        auditId: activeAudit.id,
+      });
+      if (res.data.success) {
+        toast.info("AI Sandbox pipeline started! Watching files and applying fixes...");
+      } else {
+        throw new Error(res.data.error || "Failed to start pipeline");
+      }
+    } catch (err: any) {
+      setPipelineError(err.response?.data?.error || err.message || "Failed to start execution");
+      setExecutingPipeline(false);
+      toast.error("Failed to start pipeline execution");
+    }
+  };
+
+  const handleSubmitPr = async () => {
+    if (!activeAudit) return;
+    setSubmittingPr(true);
+    try {
+      const res = await api.post("/agent/submit-pr", {
+        projectId: id,
+        auditId: activeAudit.id,
+      });
+      if (res.data.success) {
+        setPrUrl(res.data.prUrl);
+        toast.success("Pull Request opened successfully!");
+      } else {
+        throw new Error(res.data.error || "Failed to open PR");
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || err.message || "PR generation encountered an error");
+    } finally {
+      setSubmittingPr(false);
     }
   };
 
@@ -375,6 +486,105 @@ export default function ProjectDashboardPage() {
                   </button>
                 </div>
 
+                {/* Fix Pipeline Control Panel */}
+                <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 flex flex-col md:flex-row items-center justify-between gap-4">
+                  <div className="space-y-1 text-center md:text-left">
+                    <h4 className="font-semibold text-slate-800 text-sm md:text-base">
+                      AI Sandbox Execution Pipeline
+                    </h4>
+                    <p className="text-xs text-slate-450 font-light max-w-md">
+                      Let the AI agent spin up a Docker sandbox, apply these fixes, build/test the code, and submit a Pull Request.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    {(() => {
+                      const completedCount = plan ? plan.filter((item: any) => item.status === "completed").length : 0;
+                      const hasCompletedFixes = completedCount > 0;
+                      const isRunning = executingPipeline;
+                      const hasRemaining = plan ? plan.some(
+                        (item: any) => item.status === "pending" || item.status === "in-progress"
+                      ) : false;
+
+                      return (
+                        <>
+                          {/* Execute Button */}
+                          <button
+                            onClick={handleExecutePipeline}
+                            disabled={isRunning || submittingPr}
+                            className="flex items-center gap-2 text-xs md:text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-750 disabled:bg-slate-300 disabled:text-slate-500 px-4 py-2.5 rounded-xl shadow-sm transition-all hover:scale-[1.01] active:scale-98"
+                          >
+                            {isRunning ? (
+                              <>
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                Running Auto-Fixes...
+                              </>
+                            ) : (
+                              <>
+                                <Play className="w-3.5 h-3.5 fill-current" />
+                                Execute Fixes in Sandbox
+                              </>
+                            )}
+                          </button>
+
+                          {/* Submit PR Button */}
+                          {hasCompletedFixes && !hasRemaining && (
+                            <button
+                              onClick={handleSubmitPr}
+                              disabled={submittingPr}
+                              className="flex items-center gap-2 text-xs md:text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 px-4 py-2.5 rounded-xl shadow-sm transition-all hover:scale-[1.01] active:scale-98"
+                            >
+                              {submittingPr ? (
+                                <>
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                  Opening Pull Request...
+                                </>
+                              ) : (
+                                <>
+                                  <GitBranch className="w-3.5 h-3.5" />
+                                  Approve & Submit PR ({completedCount} fixes)
+                                </>
+                              )}
+                            </button>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </div>
+                </div>
+
+                {/* PR Success Alert Box */}
+                {prUrl && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="p-5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 space-y-3 w-full"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">✓</div>
+                      <div>
+                        <h4 className="font-semibold text-sm">Pull Request Opened on GitHub!</h4>
+                        <p className="text-xs text-emerald-600 font-light">All verified fixes have been pushed to a branch and submitted.</p>
+                      </div>
+                    </div>
+                    <a
+                      href={prUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-xl transition-all shadow-sm"
+                    >
+                      View Pull Request on GitHub <ExternalLink size={12} />
+                    </a>
+                  </motion.div>
+                )}
+
+                {/* Pipeline Error Banner */}
+                {pipelineError && (
+                  <div className="p-4 rounded-xl bg-rose-50 border border-rose-150 text-rose-700 flex items-center gap-3 w-full">
+                    <AlertCircle className="w-5 h-5 shrink-0" />
+                    <span className="text-xs font-medium">{pipelineError}</span>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {(() => {
                     const tasksList = Array.isArray(plan)
@@ -409,6 +619,36 @@ export default function ProjectDashboardPage() {
                       }
                     };
 
+                    const getStatusBadge = (status: string) => {
+                      switch (status?.toLowerCase()) {
+                        case "in-progress":
+                          return (
+                            <span className="flex items-center gap-1.5 text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded animate-pulse">
+                              <Loader2 className="w-2.5 h-2.5 animate-spin" />
+                              Fixing...
+                            </span>
+                          );
+                        case "completed":
+                          return (
+                            <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded">
+                              ✓ Resolved
+                            </span>
+                          );
+                        case "failed":
+                          return (
+                            <span className="flex items-center gap-1 text-[10px] font-bold text-rose-600 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded">
+                              ✗ Failed
+                            </span>
+                          );
+                        default:
+                          return (
+                            <span className="text-[10px] font-bold text-slate-400 bg-slate-50 border border-slate-150 px-2 py-0.5 rounded">
+                              Queued
+                            </span>
+                          );
+                      }
+                    };
+
                     return (
                       <div
                         key={index}
@@ -416,12 +656,28 @@ export default function ProjectDashboardPage() {
                       >
                         <div className="space-y-2">
                           <div className="flex items-center justify-between gap-2 flex-wrap">
-                            <span className={`text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded border ${getTypeStyles(task.type)}`}>
-                              {task.type}
-                            </span>
-                            <span className={`text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded border ${getPriorityStyles(task.priority)}`}>
-                              {task.priority}
-                            </span>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className={`text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded border ${getTypeStyles(task.type)}`}>
+                                {task.type}
+                              </span>
+                              <span className={`text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded border ${getPriorityStyles(task.priority)}`}>
+                                {task.priority}
+                              </span>
+                              {task.status !== undefined && getStatusBadge(task.status)}
+                            </div>
+
+                            {task.id && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteActionItem(task.id);
+                                }}
+                                className="text-slate-400 hover:text-rose-600 transition-colors p-1 rounded hover:bg-rose-50"
+                                title="Delete task"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            )}
                           </div>
 
                           <h4 className="font-semibold text-slate-800 text-sm md:text-base leading-snug">
@@ -432,10 +688,18 @@ export default function ProjectDashboardPage() {
                             📄 {task.file}
                           </p>
                         </div>
+                        {task.issue && (
+                          <div className="bg-slate-100/75 border border-slate-200/50 p-3.5 rounded-xl space-y-1">
+                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">The Issue</span>
+                            <p className="text-xs text-slate-700 font-light leading-relaxed whitespace-pre-wrap">
+                              {task.issue}
+                            </p>
+                          </div>
+                        )}
 
                         <div className="bg-indigo-950/5 border border-indigo-100/50 p-3.5 rounded-xl space-y-1">
                           <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">How to Fix</span>
-                          <p className="text-xs text-slate-700 font-light leading-relaxed">
+                          <p className="text-xs text-slate-700 font-light leading-relaxed whitespace-pre-wrap">
                             {task.fix}
                           </p>
                         </div>

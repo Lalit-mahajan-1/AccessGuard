@@ -5,7 +5,9 @@ import urlRoutes from './routes/urlRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import cookieParser from 'cookie-parser';
 import passport from './config/passport.js';
-import repoRoutes from './routes/repoRoutes.js'
+import repoRoutes from './routes/repoRoutes.js';
+import actionItemRoutes from './routes/actionItemRoutes.js';
+import agentRoutes from './routes/agentRoutes.js';
 
 const app = express();
 
@@ -26,6 +28,8 @@ app.use('/api', urlRoutes);
 app.use('/reports', express.static(join(process.cwd(), 'public', 'reports')));
 app.use('/api/auth', authRoutes);
 app.use('/api/repo',repoRoutes);
+app.use('/api/action-items', actionItemRoutes);
+app.use('/api/agent', agentRoutes);
 
 
 export default app;

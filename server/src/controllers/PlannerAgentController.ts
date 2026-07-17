@@ -43,12 +43,23 @@ export const generateProjectPlan = async (req: AuthRequest, res: Response): Prom
     const analyze = auditResponse?.analyze || {};
     const lighthouse = auditResponse?.lighthouse || {};
 
-    const accessibilityViolations = (analyze.accessibility?.violations || []).map((v: any) => ({
-      id: v.id || "",
-      impact: v.impact || "moderate",
-      selector: v.nodes?.[0]?.selector || "unknown",
-      description: v.description || "",
-    }));
+    const accessibilityViolations: any[] = [];
+    if (analyze.accessibility?.violations) {
+      for (const v of analyze.accessibility.violations) {
+        const nodes = v.nodes || [];
+        for (const node of nodes) {
+          accessibilityViolations.push({
+            id: v.id || "",
+            impact: v.impact || "moderate",
+            selector: node.selector || "unknown",
+            html: node.html || "",
+            failureSummary: node.failure || "",
+            description: v.description || "",
+            help: v.help || "",
+          });
+        }
+      }
+    }
 
     // Lighthouse scores
     const lighthouseScores = {
@@ -95,7 +106,7 @@ export const generateProjectPlan = async (req: AuthRequest, res: Response): Prom
     });
 
     // Make the POST request to local Ollama instance
-    const ollamaUrl = process.env.OLLAMA_URL || "http://localhost:11434/api/generate";
+    const ollamaUrl = process.env.OLLAMA_URL || "http://127.0.0.1:11434/api/generate";
     const ollamaModel = process.env.OLLAMA_MODEL || "qwen2.5-coder:7b";
 
     // Query installed models to select an appropriate fallback if qwen2.5-coder:7b is missing
@@ -216,16 +227,42 @@ export const generateProjectPlan = async (req: AuthRequest, res: Response): Prom
         file: item.file || item.filePath || item.path || item.filename || "",
         type: item.type || item.category || "accessibility",
         priority: item.priority || "medium",
+        issue: item.issue || item.violation || item.description || item.reason || "",
         fix: item.fix || item.remedy || item.solution || item.instruction || item.action || "",
       };
     }).filter(Boolean);
 
+    // Clear old action items for this audit to prevent duplicates
+    await prisma.actionItem.deleteMany({
+      where: { auditId },
+    });
+
+    // Create action items in DB
+    const savedActionItems = await Promise.all(
+      normalizedPlan.map((item: any) =>
+        prisma.actionItem.create({
+          data: {
+            task: item.task,
+            file: item.file,
+            type: item.type,
+            priority: item.priority,
+            issue: item.issue,
+            fix: item.fix,
+            status: "pending",
+            projectId,
+            auditId,
+            userId: req.user!.id,
+          },
+        })
+      )
+    );
+
     console.log("[Ollama Raw Response]", data.response);
-    console.log("[Ollama Normalized Plan]", normalizedPlan);
+    console.log("[Ollama Stored Action Items]", savedActionItems);
 
     res.json({
       success: true,
-      plan: normalizedPlan,
+      plan: savedActionItems,
     });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
